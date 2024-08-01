@@ -36,22 +36,38 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam))
 			{
 			case IDC_BUTTON_ADD:
-			{
 				// dialog box that requests value to added item, add item
+			{
+				//DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG_OPTION), hListBox, (DLGPROC)func, (LPARAM)0);
+				// ^^^ TODO read on how to get value from window (LPARAM?), func for this window
+				//SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)somevaluehere);
 			}
 			break;
 			case IDC_BUTTON_REMOVE:
 				// just remove selected item
 			{
 				INT index = SendMessage(hListBox, LB_GETCURSEL, 0, 0);
-				SendMessage(hListBox, LB_DELETESTRING, (WPARAM)index, 0);
-				SendMessage(hListBox, LB_SETCURSEL, 0, 0);
+				if (index == CB_ERR) MessageBox(hwnd, "There's nothing left to remove", "Nah", MB_OK | MB_ICONWARNING);
+				else
+				{
+					SendMessage(hListBox, LB_DELETESTRING, (WPARAM)index, 0);
+					SendMessage(hListBox, LB_SETCURSEL, 0, 0);
+				}
 			}
 			break;
 			case IDC_CHECK_SORT:
 				// sort on/off (????)
+				// TODO read on this more, docs say sort is set in stone after window creation
 			{
-				//
+				INT state = SendMessage(GetDlgItem(hwnd, IDC_CHECK_SORT), BM_GETCHECK, 0, 0);
+				if (state == BST_CHECKED)
+				{
+					//
+				}
+				else
+				{
+					//
+				}
 			}
 				break;
 			case IDOK:
