@@ -39,7 +39,10 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			case IDC_BUTTON_ADD:
 				// dialog box that requests value to added item, add item
 			{
-				DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_DIALOG_OPTION), GetDlgItem(hwnd, IDD_DIALOG_LIST), (DLGPROC)DlgAddOption, (LPARAM)0);
+				if (DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_DIALOG_OPTION), GetDlgItem(hwnd, IDD_DIALOG_LIST), (DLGPROC)DlgAddOption, (LPARAM)szBuffer) == IDOK)
+				{
+					SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)szBuffer);
+				}
 			}
 			break;
 			case IDC_BUTTON_REMOVE:
@@ -95,28 +98,29 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL CALLBACK DlgAddOption(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static CHAR* pBuffer;
+	INT SIZE = 256;
 	switch (uMsg)
 	{
 	case WM_INITDIALOG:
+		pBuffer = (CHAR*)lParam;
 	break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
 		case IDOK:
 		{
-			CONST INT SIZE = 256;
-			CHAR szBuffer[SIZE]{};
 			HWND hEditOption = GetDlgItem(hwnd, IDC_EDIT_OPTION);
-			SendMessage(hEditOption, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
-			if (strlen(szBuffer) == 0) MessageBox(hwnd, "There's nothing to add", "Nah", MB_OK | MB_ICONWARNING);
+			SendMessage(hEditOption, WM_GETTEXT, SIZE, (LPARAM)pBuffer);
+			if (strlen(pBuffer) == 0) MessageBox(hwnd, "There's nothing to add", "Nah", MB_OK | MB_ICONWARNING);
 			else
 			{
-				HWND hParent = GetParent(hwnd);
+				/*HWND hParent = GetParent(hwnd);
 				HWND hListBox = GetDlgItem(hParent, IDC_LIST_BOX);
-				SendMessage(hListBox, LB_ADDSTRING, SIZE, (LPARAM)szBuffer);
+				SendMessage(hListBox, LB_ADDSTRING, SIZE, (LPARAM)szBuffer);*/
+				EndDialog(hwnd, IDOK);
 			}
 		}
-		EndDialog(hwnd, 0);
 		break;
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
