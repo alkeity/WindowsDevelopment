@@ -5,6 +5,7 @@
 CONST CHAR* VALUES[] = { "Zero", "One", "Two", "Three", "Four", "Five" };
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DlgAddOption(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -38,9 +39,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			case IDC_BUTTON_ADD:
 				// dialog box that requests value to added item, add item
 			{
-				//DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG_OPTION), hListBox, (DLGPROC)func, (LPARAM)0);
-				// ^^^ TODO read on how to get value from window (LPARAM?), func for this window
-				//SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)somevaluehere);
+				DialogBoxParam(NULL, MAKEINTRESOURCE(IDD_DIALOG_OPTION), GetDlgItem(hwnd, IDD_DIALOG_LIST), (DLGPROC)DlgAddOption, (LPARAM)0);
 			}
 			break;
 			case IDC_BUTTON_REMOVE:
@@ -93,3 +92,40 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	return FALSE;
 }
+
+BOOL CALLBACK DlgAddOption(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	break;
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+		{
+			CONST INT SIZE = 256;
+			CHAR szBuffer[SIZE]{};
+			HWND hEditOption = GetDlgItem(hwnd, IDC_EDIT_OPTION);
+			SendMessage(hEditOption, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
+			if (strlen(szBuffer) == 0) MessageBox(hwnd, "There's nothing to add", "Nah", MB_OK | MB_ICONWARNING);
+			else
+			{
+				HWND hParent = GetParent(hwnd);
+				HWND hListBox = GetDlgItem(hParent, IDC_LIST_BOX);
+				SendMessage(hListBox, LB_ADDSTRING, SIZE, (LPARAM)szBuffer);
+			}
+		}
+		EndDialog(hwnd, 0);
+		break;
+		case IDCANCEL:
+			EndDialog(hwnd, 0);
+		}
+	break;
+	case WM_CLOSE:
+		EndDialog(hwnd, 0);
+	}
+
+	return FALSE;
+}
+
