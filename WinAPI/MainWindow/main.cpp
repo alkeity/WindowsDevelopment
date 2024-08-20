@@ -1,4 +1,5 @@
 ﻿#include<Windows.h>
+#include<cstdio>
 #include "resource.h"
 
 //#define TEXT_ELEMENTS
@@ -95,6 +96,17 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	return 0;
 }
 
+INT ChangeTitleMsg(HWND hwnd)
+{
+	RECT rect;
+	const INT SIZE = 256;
+	CHAR szTitle[SIZE]{};
+	GetWindowRect(hwnd, &rect);
+	sprintf(szTitle, "Size: %i x %i, coords: %i x %i", rect.right - rect.left, rect.bottom - rect.top, rect.left, rect.top);
+	SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)szTitle);
+	return 0;
+}
+
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -130,6 +142,9 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			NULL, NULL
 		);
 #endif // TEXT_ELEMENTS
+
+		ChangeTitleMsg(hwnd);
+
 		HWND hStatic = CreateWindowEx
 		(
 			NULL, "Static", "Выберите указатель мыши:",
@@ -177,6 +192,12 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			FindClose(hFind);
 		}
 	}
+		break;
+	case WM_SIZING:
+	case WM_SIZE:
+	case WM_MOVE:
+	case WM_MOVING:
+		ChangeTitleMsg(hwnd);
 		break;
 	case WM_COMMAND:
 	{
