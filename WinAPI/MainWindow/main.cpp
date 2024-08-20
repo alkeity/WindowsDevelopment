@@ -36,8 +36,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	// внешний вид
 	/*wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);*/
-	wc.hIcon = (HICON)LoadImage(hInstance, "half_moon.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
-	wc.hIconSm = (HICON)LoadImage(hInstance, "full_moon.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
+	wc.hIcon = (HICON)LoadImage(hInstance, "full_moon.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
+	wc.hIconSm = (HICON)LoadImage(hInstance, "half_moon.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
 	//wc.hCursor = LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR_STAR));
 	wc.hCursor = (HCURSOR)LoadImage(hInstance, "cursors/north_star.cur", IMAGE_CURSOR, CUR_SIZE, CUR_SIZE, LR_LOADFROMFILE);
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
@@ -55,14 +55,22 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		return 0;
 	}
 
+	// window size
+	int winWidth = GetSystemMetrics(SM_CXSCREEN) * 0.75;
+	int winHeight = GetSystemMetrics(SM_CYSCREEN) * 0.75;
+
+	// window pos
+	int posX = (GetSystemMetrics(SM_CXSCREEN) - winWidth) / 2;
+	int posY = (GetSystemMetrics(SM_CYSCREEN) - winHeight) / 2;
+
 	// создание окна
 	HWND hwnd = CreateWindowEx(
 		NULL, // dwExStyle - расширенные стили
 		g_sz_WINDOW_CLASS, // Window class
 		g_sz_WINDOW_CLASS, // Window title / Window Name
 		WS_OVERLAPPEDWINDOW, // WS = Window Style, стиль главного окна, которое будет родительским
-		CW_USEDEFAULT, CW_USEDEFAULT, //X, Y
-		CW_USEDEFAULT, CW_USEDEFAULT, // размер окна
+		posX, posY, //X, Y
+		winWidth, winHeight, // размер окна
 		NULL, // родительское окно
 		NULL, // для главного окна - это hMenu (строка меню), для дочернего окна - ID, по которому его можно найти функцией GetDlgItem
 		hInstance,
