@@ -1,4 +1,5 @@
 #include<Windows.h>
+#include<cstdio>
 #include "resource.h"
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "Calc_PD_311";
@@ -115,6 +116,37 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 		break;
 	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDC_BUTTON_0:
+		case IDC_BUTTON_1:
+		case IDC_BUTTON_2:
+		case IDC_BUTTON_3:
+		case IDC_BUTTON_4:
+		case IDC_BUTTON_5:
+		case IDC_BUTTON_6:
+		case IDC_BUTTON_7:
+		case IDC_BUTTON_8:
+		case IDC_BUTTON_9:
+		{
+			CONST INT SIZE = 256;
+			CONST INT DIGIT_SIZE = 2;
+
+			CHAR szDigit[DIGIT_SIZE]{};
+			sprintf_s(szDigit, DIGIT_SIZE, "%i", (INT)(wParam % 10));
+			CHAR szBuffer[SIZE]{};
+			HWND hDisplay = GetDlgItem(hwnd, IDC_EDIT_DISPLAY);
+
+			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
+			if (strcmp(szBuffer, "0")) strcat_s(szBuffer, SIZE, szDigit);
+			else szBuffer[0] = szDigit[0];
+			SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)szBuffer);
+
+			break;
+		}
+		default:
+			break;
+		}
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
