@@ -238,6 +238,18 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				switch (iOperation)
 				{
+				case IDC_BUTTON_PLUS:
+					iResult = Calculator::Add(iResult, Calculator::StringToDouble(szBuffer));
+					break;
+				case IDC_BUTTON_MINUS:
+					iResult = Calculator::Substract(iResult, Calculator::StringToDouble(szBuffer));
+					break;
+				case IDC_BUTTON_MULTIPLY:
+					iResult = Calculator::Multiply(iResult, Calculator::StringToDouble(szBuffer));
+					break;
+				case IDC_BUTTON_DIVIDE:
+					iResult = Calculator::Divide(iResult, Calculator::StringToDouble(szBuffer));
+					break;
 				default:
 					break;
 				}
