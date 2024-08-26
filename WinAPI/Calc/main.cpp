@@ -24,6 +24,7 @@ CONST INT g_i_START_X_OPERATIONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_I
 CONST INT g_i_START_X_CONTROL_BUTTONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 4;
 
 DOUBLE iResult = NULL;
+INT iOperation = NULL;
 BOOLEAN isResult = FALSE;
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -231,7 +232,16 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
 			isResult = TRUE;
-			iResult = Calculator::StringToDouble(szBuffer);
+			if (isResult == NULL) iResult = Calculator::StringToDouble(szBuffer);
+
+			if (iOperation != NULL)
+			{
+				switch (iOperation)
+				{
+				default:
+					break;
+				}
+			}
 		}
 
 		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)

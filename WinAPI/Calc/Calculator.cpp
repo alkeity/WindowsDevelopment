@@ -63,7 +63,7 @@ double Calculator::StringToDouble(char buffer[], int size)
 	return iNum + fNum;
 }
 
-static void DoubleToString(double number, char buffer[], int size)
+void Calculator::DoubleToString(double number, char buffer[], int size)
 {
 	sprintf_s(buffer, size, "%f", number);
 
