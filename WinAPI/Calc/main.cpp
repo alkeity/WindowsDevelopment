@@ -160,7 +160,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				g_i_START_X_OPERATIONS,
 				g_i_START_Y_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * (3 - i),
 				g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
-				hwnd, (HMENU)IDC_BUTTON_PLUS + i,
+				hwnd, (HMENU)(IDC_BUTTON_PLUS + i), // as usual, the mistake was very oblivious
 				NULL, NULL
 			);
 		}
@@ -229,11 +229,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_DIVIDE)
 		{
-			//calculations but ffs these buttons REFUSE to work as intended for whatever reason
-			//i have no mental left for this
-			//IDC_BUTTON_MINUS acts like IDC_BUTTON_BSP for whatever reason and my weekend was terrible and
-			//i give up
-			//TODO try again tmrw if i wake up at reasonable time
+			//calculations but
 		}
 
 		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
@@ -295,7 +291,6 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_DIVIDE), 0);
 				break;
 			case VK_BACK:
-				// why are you like this
 				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_BSP)), BM_SETSTATE, TRUE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_BSP), 0);
 				break;
