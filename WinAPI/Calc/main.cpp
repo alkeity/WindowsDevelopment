@@ -2,7 +2,7 @@
 #include<cstdio>
 
 #include "resource.h"
-//#include "Calculator.h"
+#include "Calculator.h"
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "Calc_PD_311";
 
@@ -229,7 +229,9 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_DIVIDE)
 		{
-			//calculations but
+			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
+			isResult = TRUE;
+			iResult = Calculator::StringToDouble(szBuffer);
 		}
 
 		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
