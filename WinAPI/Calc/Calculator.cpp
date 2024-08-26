@@ -39,14 +39,14 @@ double Calculator::Multiply(double a, double b)
 
 void Calculator::Divide(double a, double b, char resultBuffer[], int size)
 {
-	if (b == 0) { throw 1; }
+	//if (b == 0) { throw 1; }
 	double res = a / b;
 	sprintf_s(resultBuffer, size, "%f", res);
 }
 
 double Calculator::Divide(double a, double b)
 {
-	if (b == 0) { throw 1; }
+	//if (b == 0) { throw 1; }
 	return a / b;
 }
 
@@ -67,8 +67,7 @@ void Calculator::DoubleToString(double number, char buffer[], int size)
 {
 	sprintf_s(buffer, size, "%f", number);
 
-	while (buffer[strlen(buffer)] == '0')
-	{
-		buffer[strlen(buffer)] = '\0';
-	}
+	while (buffer[strlen(buffer - 1)] == '0') buffer[strlen(buffer)] = '\0';
+
+	if (buffer[strlen(buffer - 1)] == '.') buffer[strlen(buffer)] = '\0';
 }

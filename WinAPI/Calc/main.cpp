@@ -1,5 +1,6 @@
 #include<Windows.h>
 #include<cstdio>
+#include<limits>
 
 #include "resource.h"
 #include "Calculator.h"
@@ -23,10 +24,6 @@ CONST INT g_i_START_X_BUTTON = g_i_START_X;
 CONST INT g_i_START_Y_BUTTON = g_i_START_Y * 2 + g_i_DISPLAY_HEIGHT;
 CONST INT g_i_START_X_OPERATIONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 3;
 CONST INT g_i_START_X_CONTROL_BUTTONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 4;
-
-DOUBLE iResult = NULL;
-INT iOperation = NULL;
-BOOLEAN isResult = FALSE;
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -202,6 +199,12 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_COMMAND:
 	{
+		static DOUBLE iResult = DBL_MIN;
+		static DOUBLE iOperand = DBL_MIN;
+		static INT iOperation = 0;
+		static BOOLEAN isResult = FALSE;
+		static BOOLEAN isOperation = FALSE;
+
 		SetFocus(hwnd);
 
 		CONST INT SIZE = 256;
@@ -215,6 +218,13 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_POINT)
 		{
 			szDigit[0] = LOWORD(wParam) - IDC_BUTTON_0 + '0';
+			isOperation = FALSE;
+
+			if (isResult)
+			{
+				SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)"0");
+				isResult = FALSE;
+			}
 			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
 			if (LOWORD(wParam) == IDC_BUTTON_POINT)
 			{
@@ -231,54 +241,47 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_DIVIDE)
 		{
-			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
-			isResult = TRUE;
-			if (isResult == NULL) iResult = Calculator::StringToDouble(szBuffer);
+			if (isOperation && iOperation != LOWORD(wParam)) iOperation = LOWORD(wParam);
 
-			if (iOperation != NULL)
-			{
-				try
-				{
-					switch (iOperation)
-					{
-					case IDC_BUTTON_PLUS:
-						iResult = Calculator::Add(iResult, Calculator::StringToDouble(szBuffer));
-						break;
-					case IDC_BUTTON_MINUS:
-						iResult = Calculator::Substract(iResult, Calculator::StringToDouble(szBuffer));
-						break;
-					case IDC_BUTTON_MULTIPLY:
-						iResult = Calculator::Multiply(iResult, Calculator::StringToDouble(szBuffer));
-						break;
-					case IDC_BUTTON_DIVIDE:
-						iResult = Calculator::Divide(iResult, Calculator::StringToDouble(szBuffer));
-						break;
-					default:
-						break;
-					}
-
-					iOperation = wParam;
-
-				}
-				catch (const std::exception&)
-				{
-					MessageBox(NULL, "Cannot divide by zero", "Error", MB_OK | MB_ICONERROR);
-					isResult = FALSE;
-				}
-			}
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_EQUAL), 0);
+			iOperation = LOWORD(wParam);
 		}
 
 		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
 		{
-			//
+			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
+			
+			if (iResult == DBL_MIN)
+			{
+				iResult = Calculator::StringToDouble(szBuffer);
+				isResult = TRUE;
+			}
+			else if (!isOperation) iOperand = Calculator::StringToDouble(szBuffer);
+
+			if (iOperation != 0)
+			{
+				switch (iOperation)
+				{
+				case IDC_BUTTON_PLUS: iResult = Calculator::Add(iResult, iOperand); break;
+				case IDC_BUTTON_MINUS: iResult = Calculator::Substract(iResult, iOperand); break;
+				case IDC_BUTTON_MULTIPLY: iResult = Calculator::Multiply(iResult, iOperand); break;
+				case IDC_BUTTON_DIVIDE: iResult = Calculator::Divide(iResult, iOperand); break;
+				default: break;
+				}
+
+				Calculator::DoubleToString(iResult, szBuffer);
+				SendMessage(hDisplay, WM_SETTEXT, SIZE, (LPARAM)szBuffer);
+				isResult = TRUE;
+				isOperation = TRUE;
+			}
+
 		}
 
 		if (LOWORD(wParam) == IDC_BUTTON_BSP)
 		{
 			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
 			INT bufferLen = strlen(szBuffer);
-			if (bufferLen)
-				szBuffer[--bufferLen] = 0;
+			if (bufferLen) szBuffer[--bufferLen] = 0;
 			if (bufferLen == 0) szBuffer[0] = '0';
 			SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)szBuffer);
 		}
@@ -286,6 +289,9 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (LOWORD(wParam) == IDC_BUTTON_CLEAR)
 		{
 			SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)"0");
+			iResult = DBL_MIN;
+			iOperand = DBL_MIN;
+			isResult = FALSE;
 		}
 	}
 		break;
@@ -383,22 +389,14 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			case VK_SUBTRACT:
 				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MINUS)), BM_SETSTATE, TRUE, 0);
 				break;
-			case VK_MULTIPLY:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, TRUE, 0);
-				break;
 			case VK_OEM_2:
 			case VK_DIVIDE:
 				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_DIVIDE)), BM_SETSTATE, TRUE, 0);
 				break;
-			case VK_BACK:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_BSP)), BM_SETSTATE, TRUE, 0);
-				break;
-			case VK_RETURN:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_EQUAL)), BM_SETSTATE, TRUE, 0);
-				break;
-			case VK_ESCAPE:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_CLEAR)), BM_SETSTATE, TRUE, 0);
-				break;
+			case VK_MULTIPLY: SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, TRUE, 0); break;
+			case VK_BACK: SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_BSP)), BM_SETSTATE, TRUE, 0); break;
+			case VK_RETURN: SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_EQUAL)), BM_SETSTATE, TRUE, 0); break;
+			case VK_ESCAPE: SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_CLEAR)), BM_SETSTATE, TRUE, 0); break;
 			default: break;
 			}
 		}
