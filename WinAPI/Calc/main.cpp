@@ -3,6 +3,7 @@
 
 #include "resource.h"
 #include "Calculator.h"
+#include <exception>
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "Calc_PD_311";
 
@@ -236,22 +237,33 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (iOperation != NULL)
 			{
-				switch (iOperation)
+				try
 				{
-				case IDC_BUTTON_PLUS:
-					iResult = Calculator::Add(iResult, Calculator::StringToDouble(szBuffer));
-					break;
-				case IDC_BUTTON_MINUS:
-					iResult = Calculator::Substract(iResult, Calculator::StringToDouble(szBuffer));
-					break;
-				case IDC_BUTTON_MULTIPLY:
-					iResult = Calculator::Multiply(iResult, Calculator::StringToDouble(szBuffer));
-					break;
-				case IDC_BUTTON_DIVIDE:
-					iResult = Calculator::Divide(iResult, Calculator::StringToDouble(szBuffer));
-					break;
-				default:
-					break;
+					switch (iOperation)
+					{
+					case IDC_BUTTON_PLUS:
+						iResult = Calculator::Add(iResult, Calculator::StringToDouble(szBuffer));
+						break;
+					case IDC_BUTTON_MINUS:
+						iResult = Calculator::Substract(iResult, Calculator::StringToDouble(szBuffer));
+						break;
+					case IDC_BUTTON_MULTIPLY:
+						iResult = Calculator::Multiply(iResult, Calculator::StringToDouble(szBuffer));
+						break;
+					case IDC_BUTTON_DIVIDE:
+						iResult = Calculator::Divide(iResult, Calculator::StringToDouble(szBuffer));
+						break;
+					default:
+						break;
+					}
+
+					iOperation = wParam;
+
+				}
+				catch (const std::exception&)
+				{
+					MessageBox(NULL, "Cannot divide by zero", "Error", MB_OK | MB_ICONERROR);
+					isResult = FALSE;
 				}
 			}
 		}
@@ -278,16 +290,21 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 		break;
 
-	case WM_KEYDOWN:
+	case WM_KEYUP:
 	{
-		if (LOWORD(wParam) >= 0x30 && LOWORD(wParam) <= 0x39)
+		if (GetKeyState(VK_SHIFT) < 0 && LOWORD(wParam) == 0x38)
 		{
-			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x30 + IDC_BUTTON_0)), BM_SETSTATE, TRUE, 0);
+			SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, FALSE, 0);
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MULTIPLY), 0);
+		}
+		else if (LOWORD(wParam) >= 0x30 && LOWORD(wParam) <= 0x39)
+		{
+			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x30 + IDC_BUTTON_0)), BM_SETSTATE, FALSE, 0);
 			SendMessage(hwnd, WM_COMMAND, LOWORD(wParam - 0x30 + IDC_BUTTON_0), 0);
 		}
 		else if (LOWORD(wParam) >= 0x60 && LOWORD(wParam) <= 0x69)
 		{
-			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x69 + IDC_BUTTON_0)), BM_SETSTATE, TRUE, 0);
+			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x69 + IDC_BUTTON_0)), BM_SETSTATE, FALSE, 0);
 			SendMessage(hwnd, WM_COMMAND, LOWORD(wParam - 0x69 + IDC_BUTTON_0), 0);
 		}
 		else
@@ -295,31 +312,39 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam))
 			{
 			case VK_OEM_PERIOD:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_POINT)), BM_SETSTATE, TRUE, 0);
+			case VK_DECIMAL:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_POINT)), BM_SETSTATE, FALSE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_POINT), 0);
 				break;
 			case VK_OEM_PLUS:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_PLUS)), BM_SETSTATE, TRUE, 0);
+			case VK_ADD:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_PLUS)), BM_SETSTATE, FALSE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_PLUS), 0);
 				break;
 			case VK_OEM_MINUS:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MINUS)), BM_SETSTATE, TRUE, 0);
+			case VK_SUBTRACT:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MINUS)), BM_SETSTATE, FALSE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MINUS), 0);
 				break;
 			case VK_MULTIPLY:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, TRUE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, FALSE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MULTIPLY), 0);
 				break;
 			case VK_DIVIDE:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_DIVIDE)), BM_SETSTATE, TRUE, 0);
+			case VK_OEM_2:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_DIVIDE)), BM_SETSTATE, FALSE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_DIVIDE), 0);
 				break;
 			case VK_BACK:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_BSP)), BM_SETSTATE, TRUE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_BSP)), BM_SETSTATE, FALSE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_BSP), 0);
 				break;
+			case VK_RETURN:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_EQUAL)), BM_SETSTATE, FALSE, 0);
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_EQUAL), 0);
+				break;
 			case VK_ESCAPE:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_CLEAR)), BM_SETSTATE, TRUE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_CLEAR)), BM_SETSTATE, FALSE, 0);
 				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_CLEAR), 0);
 				break;
 			default: break;
@@ -328,40 +353,51 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 		break;
 
-	case WM_KEYUP:
+	case WM_KEYDOWN:
 	{
-		if (LOWORD(wParam) >= 0x30 && LOWORD(wParam) <= 0x39)
+		if (GetKeyState(VK_SHIFT) < 0 && LOWORD(wParam) == 0x38)
 		{
-			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x30 + IDC_BUTTON_0)), BM_SETSTATE, FALSE, 0);
+			SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, TRUE, 0);
+		}
+		else if (LOWORD(wParam) >= 0x30 && LOWORD(wParam) <= 0x39)
+		{
+			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x30 + IDC_BUTTON_0)), BM_SETSTATE, TRUE, 0);
 		}
 		else if (LOWORD(wParam) >= 0x60 && LOWORD(wParam) <= 0x69)
 		{
-			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x69 + IDC_BUTTON_0)), BM_SETSTATE, FALSE, 0);
+			SendMessage(GetDlgItem(hwnd, LOWORD(wParam - 0x69 + IDC_BUTTON_0)), BM_SETSTATE, TRUE, 0);
 		}
 		else
 		{
 			switch (LOWORD(wParam))
 			{
+			case VK_DECIMAL:
 			case VK_OEM_PERIOD:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_POINT)), BM_SETSTATE, FALSE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_POINT)), BM_SETSTATE, TRUE, 0);
 				break;
 			case VK_OEM_PLUS:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_PLUS)), BM_SETSTATE, FALSE, 0);
+			case VK_ADD:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_PLUS)), BM_SETSTATE, TRUE, 0);
 				break;
 			case VK_OEM_MINUS:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MINUS)), BM_SETSTATE, FALSE, 0);
+			case VK_SUBTRACT:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MINUS)), BM_SETSTATE, TRUE, 0);
 				break;
 			case VK_MULTIPLY:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, FALSE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_MULTIPLY)), BM_SETSTATE, TRUE, 0);
 				break;
+			case VK_OEM_2:
 			case VK_DIVIDE:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_DIVIDE)), BM_SETSTATE, FALSE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_DIVIDE)), BM_SETSTATE, TRUE, 0);
 				break;
 			case VK_BACK:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_BSP)), BM_SETSTATE, FALSE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_BSP)), BM_SETSTATE, TRUE, 0);
+				break;
+			case VK_RETURN:
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_EQUAL)), BM_SETSTATE, TRUE, 0);
 				break;
 			case VK_ESCAPE:
-				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_CLEAR)), BM_SETSTATE, FALSE, 0);
+				SendMessage(GetDlgItem(hwnd, LOWORD(IDC_BUTTON_CLEAR)), BM_SETSTATE, TRUE, 0);
 				break;
 			default: break;
 			}
