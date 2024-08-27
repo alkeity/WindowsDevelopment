@@ -18,7 +18,7 @@ CONST INT g_i_BUTTON_DOUBLE_SIZE = g_i_BUTTON_SIZE * 2 + g_i_INTERVAL;
 CONST INT g_i_DISPLAY_WIDTH = (g_i_BUTTON_SIZE + g_i_INTERVAL) * 5;
 CONST INT g_i_DISPLAY_HEIGHT = 25;
 CONST INT g_i_WINDOW_WIDTH = g_i_DISPLAY_WIDTH + g_i_START_X * 2 + 16;
-CONST INT g_i_WINDOW_HEIGHT = g_i_DISPLAY_HEIGHT + g_i_START_Y * 2 + g_i_BUTTON_SIZE * 4 + g_i_TITLE_HEIGHT + g_i_INTERVAL * 5;
+CONST INT g_i_WINDOW_HEIGHT = g_i_DISPLAY_HEIGHT + g_i_START_Y * 2 + g_i_BUTTON_SIZE * 4 + g_i_TITLE_HEIGHT + g_i_INTERVAL * 4 + 30;
 
 CONST INT g_i_START_X_BUTTON = g_i_START_X;
 CONST INT g_i_START_Y_BUTTON = g_i_START_Y * 2 + g_i_DISPLAY_HEIGHT;
@@ -53,6 +53,14 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		return 0;
 	}
 
+	HMENU hMenuBar = CreateMenu();
+	HMENU hMenuTheme = CreateMenu();
+
+	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_DEFAULT, "Default");
+	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_ORANGE, "Orange");
+
+	AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hMenuTheme, "Themes");
+
 	HWND hwnd = CreateWindowEx(
 		NULL,
 		g_sz_WINDOW_CLASS,
@@ -61,7 +69,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		g_i_WINDOW_WIDTH, g_i_WINDOW_HEIGHT,
 		NULL,
-		NULL,
+		hMenuBar,
 		hInstance,
 		NULL
 	);
