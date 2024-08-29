@@ -27,8 +27,8 @@ CONST INT g_i_START_X_OPERATIONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_I
 CONST INT g_i_START_X_CONTROL_BUTTONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 4;
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 VOID SetSkin(HWND hwnd, LPSTR skinName);
+BOOL CALLBACK SetFont(HWND hwnd, LPARAM font);
 
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
@@ -104,8 +104,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	static INT iTheme = IDM_THEME_DEFAULT;
-
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -234,6 +232,14 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 
 		SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0);
+
+		HFONT font;
+		HDC hdc = GetDC(NULL);
+		LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+		ReleaseDC(NULL, hdc);
+		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Ravie");
+		if (!font) MessageBox(hwnd, "Font creation failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
+		EnumChildWindows(hwnd, (WNDENUMPROC)SetFont, (LPARAM)font);
 	}
 		break;
 
@@ -537,4 +543,10 @@ VOID SetSkin(HWND hwnd, LPSTR skinName)
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
 	}
+}
+
+BOOL CALLBACK SetFont(HWND hwnd, LPARAM font)
+{
+	SendMessage(hwnd, WM_SETFONT, font, TRUE);
+	return TRUE;
 }
