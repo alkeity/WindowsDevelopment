@@ -1,6 +1,7 @@
 #include<Windows.h>
 #include<cstdio>
 #include<limits>
+#include<uxtheme.h>
 
 #include "resource.h"
 #include "Calculator.h"
@@ -26,6 +27,9 @@ CONST INT g_i_START_X_OPERATIONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_I
 CONST INT g_i_START_X_CONTROL_BUTTONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 4;
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+VOID SetSkin(HWND hwnd, LPSTR skinName);
+
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -57,16 +61,21 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	HMENU hMenuTheme = CreateMenu();
 
 	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_DEFAULT, "Default");
+	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_BLUE, "Blue");
 	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_ORANGE, "Orange");
 
 	AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hMenuTheme, "Themes");
+
+	// window pos
+	int posX = (GetSystemMetrics(SM_CXSCREEN) - g_i_WINDOW_WIDTH) / 2;
+	int posY = (GetSystemMetrics(SM_CYSCREEN) - g_i_WINDOW_HEIGHT) / 2;
 
 	HWND hwnd = CreateWindowEx(
 		NULL,
 		g_sz_WINDOW_CLASS,
 		g_sz_WINDOW_CLASS,
 		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		posX, posY,
 		g_i_WINDOW_WIDTH, g_i_WINDOW_HEIGHT,
 		NULL,
 		hMenuBar,
@@ -95,6 +104,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static INT iTheme = IDM_THEME_DEFAULT;
+
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -121,7 +132,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				CreateWindowEx
 				(
 					NULL, "Button", szDigit,
-					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 					g_i_START_X_BUTTON + j * (g_i_BUTTON_SIZE + g_i_INTERVAL),
 					g_i_START_Y_BUTTON + i * (g_i_BUTTON_SIZE + g_i_INTERVAL),
 					g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
@@ -143,17 +154,28 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 		// load .bmp image as button "style"
 		// TODO figure out themes
-		SendMessage
+		/*SendMessage
 		(
 			GetDlgItem(hwnd, IDC_BUTTON_0),
 			BM_SETIMAGE, IMAGE_BITMAP,
-			(LPARAM)LoadImage(NULL, "resources\\0.bmp", IMAGE_BITMAP, g_i_BUTTON_DOUBLE_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE)
-		);
+			(LPARAM)LoadImage(NULL, "resources\\themeOrange\\0.bmp", IMAGE_BITMAP, g_i_BUTTON_DOUBLE_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE)
+		);*/
+		//DWORD dwErrorMsgID = GetLastError(); // ID of last exception
+		//LPSTR lpszMsgBuffer = NULL;
+		//DWORD dwSize = FormatMessage
+		//(
+		//	FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		//	NULL, dwErrorMsgID,
+		//	MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
+		//	(LPSTR)&lpszMsgBuffer,
+		//	0, NULL
+		//);
+		//MessageBox(hwnd, lpszMsgBuffer, "Error", MB_OK | MB_ICONERROR);
 
 		CreateWindowEx
 		(
 			NULL, "Button", ".",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON/* | BS_BITMAP*/,
 			g_i_START_X_BUTTON + g_i_BUTTON_DOUBLE_SIZE + g_i_INTERVAL,
 			g_i_START_Y_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 3,
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
@@ -175,7 +197,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				g_i_START_X_OPERATIONS,
 				g_i_START_Y_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * (3 - i),
 				g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
-				hwnd, (HMENU)(IDC_BUTTON_PLUS + i), // as usual, the mistake was very oblivious
+				hwnd, (HMENU)(IDC_BUTTON_PLUS + i),
 				NULL, NULL
 			);
 		}
@@ -203,13 +225,15 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CreateWindowEx
 		(
 			NULL, "Button", "=",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON/* | BS_BITMAP*/,
 			g_i_START_X_CONTROL_BUTTONS, 
 			g_i_START_Y_BUTTON + g_i_BUTTON_DOUBLE_SIZE + g_i_INTERVAL,
 			g_i_BUTTON_SIZE, g_i_BUTTON_DOUBLE_SIZE,
 			hwnd, (HMENU)IDC_BUTTON_EQUAL,
 			NULL, NULL
 		);
+
+		SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0);
 	}
 		break;
 
@@ -255,7 +279,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)szBuffer);
 		}
 
-		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_DIVIDE)
+		else if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_DIVIDE)
 		{
 			if (isOperation && iOperation != LOWORD(wParam)) iOperation = LOWORD(wParam);
 
@@ -263,7 +287,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			iOperation = LOWORD(wParam);
 		}
 
-		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
+		else if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
 		{
 			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
 			
@@ -293,7 +317,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		}
 
-		if (LOWORD(wParam) == IDC_BUTTON_BSP)
+		else if (LOWORD(wParam) == IDC_BUTTON_BSP)
 		{
 			SendMessage(hDisplay, WM_GETTEXT, SIZE, (LPARAM)szBuffer);
 			INT bufferLen = strlen(szBuffer);
@@ -302,12 +326,37 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)szBuffer);
 		}
 
-		if (LOWORD(wParam) == IDC_BUTTON_CLEAR)
+		else if (LOWORD(wParam) == IDC_BUTTON_CLEAR)
 		{
 			SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)"0");
 			iResult = DBL_MIN;
 			iOperand = DBL_MIN;
 			isResult = FALSE;
+		}
+
+		else if (LOWORD(wParam) >= IDM_THEME_DEFAULT && LOWORD(wParam) <= IDM_THEME_ORANGE)
+		{
+			//SendMessage(hwnd, WM_THEMECHANGED, 0, 0);
+			//CloseThemeData();
+			LPSTR themeName = NULL;
+
+			switch (LOWORD(wParam))
+			{
+			case IDM_THEME_DEFAULT: themeName = (LPSTR)"themeGreen"; break;
+			case IDM_THEME_BLUE:
+			{
+				themeName = (LPSTR)"themeBlue";
+				/*HDC hdc = GetDC(hwnd);
+				SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdc, 0);
+				SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)GetDC(GetDlgItem(hwnd, IDC_EDIT_DISPLAY)), 0);
+				ReleaseDC(hwnd, hdc);*/
+			}
+				break;
+			case IDM_THEME_ORANGE: themeName = (LPSTR)"themeOrange"; break;
+			default:
+				break;
+			}
+			SetSkin(hwnd, themeName);
 		}
 	}
 		break;
@@ -419,6 +468,45 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 		break;
 
+	case WM_CTLCOLOREDIT:
+	{
+		HDC hdc = (HDC)wParam;
+		SetBkMode(hdc, OPAQUE);
+		SetBkColor(hdc, RGB(0, 0, 255));
+		HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 200));
+		SetTextColor(hdc, RGB(255, 0, 0));
+
+		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrush);
+		SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
+		SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETTEXT, 0, (LPARAM)"0");
+
+		return (LRESULT)hBrush;
+	}
+
+	case WM_CONTEXTMENU:
+	{
+		HMENU hMainMenu = CreatePopupMenu();
+		HMENU hThemeSubMenu = CreatePopupMenu();
+
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_EXIT, "Exit");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hThemeSubMenu, "Skins");
+		InsertMenu(hThemeSubMenu, 0, MF_BYPOSITION | MF_STRING, CM_THEME_GREEN, "Green");
+		InsertMenu(hThemeSubMenu, 0, MF_BYPOSITION | MF_STRING, CM_THEME_BLUE, "Blue");
+
+		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN | TPM_RETURNCMD, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
+
+		switch (item)
+		{
+		case CM_THEME_BLUE: SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_BLUE), 0); break;
+		case CM_THEME_GREEN: SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0); break;
+		case CM_EXIT: SendMessage(hwnd, WM_CLOSE, 0, 0); break;
+		default:
+			break;
+		}
+	}
+		break;
+
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -431,4 +519,22 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 	return 0;
+}
+
+VOID SetSkin(HWND hwnd, LPSTR skinName)
+{
+	CHAR szFile[MAX_PATH]{};
+	HWND hButton;
+	for (size_t i = IDC_BUTTON_0; i <= IDC_BUTTON_9; i++)
+	{
+		hButton = GetDlgItem(hwnd, i);
+		sprintf_s(szFile, MAX_PATH, "resources\\%s\\button_%i.bmp", skinName, i - IDC_BUTTON_0);
+		HANDLE hImage = LoadImage(
+			GetModuleHandle(NULL), szFile, IMAGE_BITMAP,
+			i == IDC_BUTTON_0 ? g_i_BUTTON_DOUBLE_SIZE : g_i_BUTTON_SIZE,
+			g_i_BUTTON_SIZE,
+			LR_LOADFROMFILE
+		);
+		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
+	}
 }

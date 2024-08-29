@@ -2,6 +2,13 @@
 // Microsoft Visual C++ generated include file.
 // Used by Resource.rc
 
+#define IDR_MENU_BAR 100
+#define IDR_MENU_THEME 101
+
+#define CM_EXIT 200
+#define CM_THEME_BLUE 201
+#define CM_THEME_GREEN 202
+
 #define IDC_EDIT_DISPLAY 999
 
 #define IDC_BUTTON_0 1000
@@ -24,11 +31,9 @@
 #define IDC_BUTTON_CLEAR 1016
 #define IDC_BUTTON_EQUAL 1017
 
-#define IDR_MENU_BAR 100
-#define IDR_MENU_THEME 101
-
 #define IDM_THEME_DEFAULT 9000
-#define IDM_THEME_ORANGE 9001
+#define IDM_THEME_BLUE 9001
+#define IDM_THEME_ORANGE 9002
 
 // Next default values for new objects
 // 
