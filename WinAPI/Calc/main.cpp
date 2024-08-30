@@ -33,6 +33,7 @@ BOOL CALLBACK SetFont(HWND hwnd, LPARAM font);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
+
 	WNDCLASSEX wc;
 
 	ZeroMemory(&wc, sizeof(wc));
