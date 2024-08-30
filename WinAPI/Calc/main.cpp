@@ -112,7 +112,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HWND hDisplay = CreateWindowEx
 		(
 			NULL, "Edit", "0",
-			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_NUMBER | ES_READONLY | ES_RIGHT,
+			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_NUMBER /*| ES_READONLY*/ | ES_RIGHT,
 			g_i_START_X, g_i_START_Y,
 			g_i_DISPLAY_WIDTH, g_i_DISPLAY_HEIGHT,
 			hwnd, (HMENU)IDC_EDIT_DISPLAY,
@@ -238,7 +238,9 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HDC hdc = GetDC(NULL);
 		LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 		ReleaseDC(NULL, hdc);
-		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Ravie");
+		//font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Ravie");
+		AddFontResourceEx("resources\\digital-7.ttf", FR_PRIVATE, 0);
+		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "digital-7");
 		if (!font) MessageBox(hwnd, "Font creation failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
 		EnumChildWindows(hwnd, (WNDENUMPROC)SetFont, (LPARAM)font);
 	}
@@ -353,10 +355,10 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			case IDM_THEME_BLUE:
 			{
 				themeName = (LPSTR)"themeBlue";
-				/*HDC hdc = GetDC(hwnd);
+				HDC hdc = GetDC(hwnd);
 				SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdc, 0);
 				SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)GetDC(GetDlgItem(hwnd, IDC_EDIT_DISPLAY)), 0);
-				ReleaseDC(hwnd, hdc);*/
+				ReleaseDC(hwnd, hdc);
 			}
 				break;
 			case IDM_THEME_ORANGE: themeName = (LPSTR)"themeOrange"; break;
@@ -484,8 +486,8 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetTextColor(hdc, RGB(255, 0, 0));
 
 		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrush);
-		SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
-		SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETTEXT, 0, (LPARAM)"0");
+		//SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
+		//SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETTEXT, 0, (LPARAM)"0");
 
 		return (LRESULT)hBrush;
 	}
