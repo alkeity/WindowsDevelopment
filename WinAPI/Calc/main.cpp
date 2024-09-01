@@ -7,6 +7,8 @@
 #include "Calculator.h"
 #include <exception>
 
+enum COLOR{ BLUE, GREEN };
+
 CONST CHAR g_sz_WINDOW_CLASS[] = "Calc_PD_311";
 
 CONST INT g_i_START_X = 10;
@@ -26,8 +28,14 @@ CONST INT g_i_START_Y_BUTTON = g_i_START_Y * 2 + g_i_DISPLAY_HEIGHT;
 CONST INT g_i_START_X_OPERATIONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 3;
 CONST INT g_i_START_X_CONTROL_BUTTONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 4;
 
+CONST COLORREF g_COLORS[][3] =
+{
+	{ RGB(0, 0, 200), RGB(0, 0, 100), RGB(255, 0, 0) },
+	{ RGB(0, 200, 0), RGB(0, 100, 0), RGB(0, 255, 0) },
+};
+
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-VOID SetSkin(HWND hwnd, LPSTR skinName);
+VOID SetSkin(HWND hwnd, LPSTR skinName, INT skin);
 BOOL CALLBACK SetFont(HWND hwnd, LPARAM font);
 
 
@@ -105,6 +113,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static CONST CHAR skin[MAX_PATH]{};
+	static COLOR colorScheme = COLOR::BLUE;
+
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -233,16 +244,6 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 
 		SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0);
-
-		HFONT font;
-		HDC hdc = GetDC(NULL);
-		LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-		ReleaseDC(NULL, hdc);
-		//font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Ravie");
-		AddFontResourceEx("resources\\digital-7.ttf", FR_PRIVATE, 0);
-		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "digital-7");
-		if (!font) MessageBox(hwnd, "Font creation failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
-		EnumChildWindows(hwnd, (WNDENUMPROC)SetFont, (LPARAM)font);
 	}
 		break;
 
@@ -351,7 +352,9 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			switch (LOWORD(wParam))
 			{
-			case IDM_THEME_DEFAULT: themeName = (LPSTR)"themeGreen"; break;
+			case IDM_THEME_DEFAULT:
+				themeName = (LPSTR)"themeGreen";
+				break;
 			case IDM_THEME_BLUE:
 			{
 				themeName = (LPSTR)"themeBlue";
@@ -365,7 +368,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			default:
 				break;
 			}
-			SetSkin(hwnd, themeName);
+			SetSkin(hwnd, themeName, LOWORD(wParam));
 		}
 	}
 		break;
@@ -530,7 +533,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-VOID SetSkin(HWND hwnd, LPSTR skinName)
+VOID SetSkin(HWND hwnd, LPSTR skinName, INT skin)
 {
 	CHAR szFile[MAX_PATH]{};
 	HWND hButton;
@@ -546,6 +549,24 @@ VOID SetSkin(HWND hwnd, LPSTR skinName)
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
 	}
+
+	HFONT font;
+	HDC hdc = GetDC(NULL);
+	LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	ReleaseDC(NULL, hdc);
+	
+
+	if (skin == IDM_THEME_BLUE)
+	{
+		AddFontResourceEx("resources\\digital-7.ttf", FR_PRIVATE, 0);
+		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "digital-7");
+	}
+	else
+	{
+		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Ravie");
+	}
+	if (!font) MessageBox(hwnd, "Font creation failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
+	EnumChildWindows(hwnd, (WNDENUMPROC)SetFont, (LPARAM)font);
 }
 
 BOOL CALLBACK SetFont(HWND hwnd, LPARAM font)
