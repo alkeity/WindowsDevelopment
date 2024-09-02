@@ -35,8 +35,9 @@ CONST COLORREF g_COLORS[][3] =
 };
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-VOID SetSkin(HWND hwnd, LPSTR skinName, INT skin);
+VOID SetSkin(HWND hwnd, LPSTR skinName);
 BOOL CALLBACK SetFont(HWND hwnd, LPARAM font);
+VOID SetFont(HWND hwnd, INT fontName);
 
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
@@ -244,6 +245,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 
 		SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0);
+		SetFont(hwnd, CM_FONT_RAVIE);
 	}
 		break;
 
@@ -368,7 +370,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			default:
 				break;
 			}
-			SetSkin(hwnd, themeName, LOWORD(wParam));
+			SetSkin(hwnd, themeName);
 		}
 	}
 		break;
@@ -499,12 +501,16 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		HMENU hMainMenu = CreatePopupMenu();
 		HMENU hThemeSubMenu = CreatePopupMenu();
+		HMENU hFontSubMenu = CreatePopupMenu();
 
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_STRING, CM_EXIT, "Exit");
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
 		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hThemeSubMenu, "Skins");
+		InsertMenu(hMainMenu, 0, MF_BYPOSITION | MF_POPUP, (UINT_PTR)hFontSubMenu, "Fonts");
 		InsertMenu(hThemeSubMenu, 0, MF_BYPOSITION | MF_STRING, CM_THEME_GREEN, "Green");
 		InsertMenu(hThemeSubMenu, 0, MF_BYPOSITION | MF_STRING, CM_THEME_BLUE, "Blue");
+		InsertMenu(hFontSubMenu, 0, MF_BYPOSITION | MF_STRING, CM_FONT_DIGITAL7, "Digital-7");
+		InsertMenu(hFontSubMenu, 0, MF_BYPOSITION | MF_STRING, CM_FONT_RAVIE, "Ravie");
 
 		BOOL item = TrackPopupMenuEx(hMainMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN | TPM_RETURNCMD, LOWORD(lParam), HIWORD(lParam), hwnd, NULL);
 
@@ -512,6 +518,8 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case CM_THEME_BLUE: SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_BLUE), 0); break;
 		case CM_THEME_GREEN: SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0); break;
+		case CM_FONT_DIGITAL7: SetFont(hwnd, CM_FONT_DIGITAL7); break;
+		case CM_FONT_RAVIE: SetFont(hwnd, CM_FONT_RAVIE); break;
 		case CM_EXIT: SendMessage(hwnd, WM_CLOSE, 0, 0); break;
 		default:
 			break;
@@ -533,7 +541,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-VOID SetSkin(HWND hwnd, LPSTR skinName, INT skin)
+VOID SetSkin(HWND hwnd, LPSTR skinName)
 {
 	CHAR szFile[MAX_PATH]{};
 	HWND hButton;
@@ -549,14 +557,17 @@ VOID SetSkin(HWND hwnd, LPSTR skinName, INT skin)
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
 	}
+}
 
+VOID SetFont(HWND hwnd, INT fontName)
+{
 	HFONT font;
 	HDC hdc = GetDC(NULL);
 	LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 	ReleaseDC(NULL, hdc);
-	
 
-	if (skin == IDM_THEME_BLUE)
+
+	if (fontName == CM_FONT_DIGITAL7)
 	{
 		AddFontResourceEx("resources\\digital-7.ttf", FR_PRIVATE, 0);
 		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "digital-7");

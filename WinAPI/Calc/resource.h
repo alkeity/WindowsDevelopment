@@ -8,6 +8,8 @@
 #define CM_EXIT 200
 #define CM_THEME_BLUE 201
 #define CM_THEME_GREEN 202
+#define CM_FONT_DIGITAL7 210
+#define CM_FONT_RAVIE 211
 
 #define IDC_EDIT_DISPLAY 999
 
