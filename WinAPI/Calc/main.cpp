@@ -521,8 +521,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case CM_FONT_DIGITAL7: SetFont(hwnd, CM_FONT_DIGITAL7); break;
 		case CM_FONT_RAVIE: SetFont(hwnd, CM_FONT_RAVIE); break;
 		case CM_EXIT: SendMessage(hwnd, WM_CLOSE, 0, 0); break;
-		default:
-			break;
+		default: break;
 		}
 	}
 		break;
@@ -543,7 +542,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 VOID SetSkin(HWND hwnd, LPSTR skinName)
 {
-	CHAR szFile[MAX_PATH]{};
+	/*CHAR szFile[MAX_PATH]{};
 	HWND hButton;
 	for (size_t i = IDC_BUTTON_0; i <= IDC_BUTTON_9; i++)
 	{
@@ -556,7 +555,26 @@ VOID SetSkin(HWND hwnd, LPSTR skinName)
 			LR_LOADFROMFILE
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
+	}*/
+
+	HWND hButton;
+	HINSTANCE hButtons;
+
+	if (skinName == "themeBlue") hButtons = LoadLibrary("resources/SkinBlue.dll");
+	else hButtons = LoadLibrary("resources/SkinGreen.dll");
+
+	for (size_t i = 0; i <= 9; i++)
+	{
+		hButton = GetDlgItem(hwnd, i + 1000);
+		HBITMAP hImage = (HBITMAP)LoadImage(
+			hButtons, MAKEINTRESOURCE(100 + i), IMAGE_BITMAP,
+			i == IDC_BUTTON_0 - 1000 ? g_i_BUTTON_DOUBLE_SIZE : g_i_BUTTON_SIZE,
+			g_i_BUTTON_SIZE,
+			LR_SHARED
+		);
+		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
 	}
+	FreeLibrary(hButtons);
 }
 
 VOID SetFont(HWND hwnd, INT fontName)
