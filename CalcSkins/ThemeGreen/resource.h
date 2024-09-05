@@ -13,6 +13,15 @@
 #define IDB_BUTTON_8                    108
 #define IDB_BUTTON_9                    109
 
+#define IDB_BUTTON_POINT                110
+#define IDB_BUTTON_PLUS                 111
+#define IDB_BUTTON_MINUS                112
+#define IDB_BUTTON_MULTIPLY             113
+#define IDB_BUTTON_DIVIDE               114
+#define IDB_BUTTON_BSP                  115
+#define IDB_BUTTON_CLEAR                116
+#define IDB_BUTTON_EQUAL                117
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

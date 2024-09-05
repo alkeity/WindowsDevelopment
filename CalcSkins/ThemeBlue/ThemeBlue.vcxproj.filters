@@ -76,5 +76,11 @@
     <Image Include="..\..\WinAPI\Calc\resources\themeBlue\button_slash.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="F:\Учеба\Академия TOP\square_blue_full\button_equal.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="F:\Учеба\Академия TOP\square_blue_full\button_point.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -159,6 +159,8 @@
     <Image Include="..\..\WinAPI\Calc\resources\themeBlue\button_minus.bmp" />
     <Image Include="..\..\WinAPI\Calc\resources\themeBlue\button_plus.bmp" />
     <Image Include="..\..\WinAPI\Calc\resources\themeBlue\button_slash.bmp" />
+    <Image Include="F:\Учеба\Академия TOP\square_blue_full\button_equal.bmp" />
+    <Image Include="F:\Учеба\Академия TOP\square_blue_full\button_point.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
