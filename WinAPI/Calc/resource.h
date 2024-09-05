@@ -35,7 +35,6 @@
 
 #define IDM_THEME_DEFAULT 9000
 #define IDM_THEME_BLUE 9001
-#define IDM_THEME_ORANGE 9002
 
 // Next default values for new objects
 // 

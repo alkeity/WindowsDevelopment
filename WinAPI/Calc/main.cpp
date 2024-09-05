@@ -36,6 +36,7 @@ CONST COLORREF g_COLORS[][3] =
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 VOID SetSkin(HWND hwnd, LPSTR skinName);
+VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName);
 BOOL CALLBACK SetFont(HWND hwnd, LPARAM font);
 VOID SetFont(HWND hwnd, INT fontName);
 
@@ -72,7 +73,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_DEFAULT, "Default");
 	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_BLUE, "Blue");
-	AppendMenu(hMenuTheme, MF_STRING, IDM_THEME_ORANGE, "Orange");
 
 	AppendMenu(hMenuBar, MF_POPUP, (UINT_PTR)hMenuTheme, "Themes");
 
@@ -163,14 +163,6 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			hwnd, (HMENU)IDC_BUTTON_0,
 			NULL, NULL
 		);
-		// load .bmp image as button "style"
-		// TODO figure out themes
-		/*SendMessage
-		(
-			GetDlgItem(hwnd, IDC_BUTTON_0),
-			BM_SETIMAGE, IMAGE_BITMAP,
-			(LPARAM)LoadImage(NULL, "resources\\themeOrange\\0.bmp", IMAGE_BITMAP, g_i_BUTTON_DOUBLE_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE)
-		);*/
 		//DWORD dwErrorMsgID = GetLastError(); // ID of last exception
 		//LPSTR lpszMsgBuffer = NULL;
 		//DWORD dwSize = FormatMessage
@@ -186,7 +178,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CreateWindowEx
 		(
 			NULL, "Button", ".",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON/* | BS_BITMAP*/,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			g_i_START_X_BUTTON + g_i_BUTTON_DOUBLE_SIZE + g_i_INTERVAL,
 			g_i_START_Y_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 3,
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
@@ -204,7 +196,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			CreateWindowEx
 			(
 				NULL, "Button", (LPCSTR)operation,
-				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 				g_i_START_X_OPERATIONS,
 				g_i_START_Y_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * (3 - i),
 				g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
@@ -216,7 +208,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CreateWindowEx
 		(
 			NULL, "Button", "<-",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			g_i_START_X_CONTROL_BUTTONS, g_i_START_Y_BUTTON,
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 			hwnd, (HMENU)IDC_BUTTON_BSP,
@@ -225,7 +217,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CreateWindowEx
 		(
 			NULL, "Button", "C",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			g_i_START_X_CONTROL_BUTTONS,
 			g_i_START_Y_BUTTON + g_i_BUTTON_SIZE + g_i_INTERVAL,
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
@@ -236,7 +228,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CreateWindowEx
 		(
 			NULL, "Button", "=",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON/* | BS_BITMAP*/,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			g_i_START_X_CONTROL_BUTTONS, 
 			g_i_START_Y_BUTTON + g_i_BUTTON_DOUBLE_SIZE + g_i_INTERVAL,
 			g_i_BUTTON_SIZE, g_i_BUTTON_DOUBLE_SIZE,
@@ -346,7 +338,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			isResult = FALSE;
 		}
 
-		else if (LOWORD(wParam) >= IDM_THEME_DEFAULT && LOWORD(wParam) <= IDM_THEME_ORANGE)
+		else if (LOWORD(wParam) >= IDM_THEME_DEFAULT && LOWORD(wParam) <= IDM_THEME_BLUE)
 		{
 			//SendMessage(hwnd, WM_THEMECHANGED, 0, 0);
 			//CloseThemeData();
@@ -366,11 +358,10 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				ReleaseDC(hwnd, hdc);
 			}
 				break;
-			case IDM_THEME_ORANGE: themeName = (LPSTR)"themeOrange"; break;
 			default:
 				break;
 			}
-			SetSkin(hwnd, themeName);
+			SetSkinFromDLL(hwnd, themeName);
 		}
 	}
 		break;
@@ -542,7 +533,7 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 VOID SetSkin(HWND hwnd, LPSTR skinName)
 {
-	/*CHAR szFile[MAX_PATH]{};
+	CHAR szFile[MAX_PATH]{};
 	HWND hButton;
 	for (size_t i = IDC_BUTTON_0; i <= IDC_BUTTON_9; i++)
 	{
@@ -555,21 +546,24 @@ VOID SetSkin(HWND hwnd, LPSTR skinName)
 			LR_LOADFROMFILE
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
-	}*/
+	}
+}
 
+VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName)
+{
 	HWND hButton;
 	HINSTANCE hButtons;
 
 	if (skinName == "themeBlue") hButtons = LoadLibrary("resources/SkinBlue.dll");
 	else hButtons = LoadLibrary("resources/SkinGreen.dll");
 
-	for (size_t i = 0; i <= 9; i++)
+	for (size_t i = 0; i <= 17; i++)
 	{
 		hButton = GetDlgItem(hwnd, i + 1000);
 		HBITMAP hImage = (HBITMAP)LoadImage(
 			hButtons, MAKEINTRESOURCE(100 + i), IMAGE_BITMAP,
-			i == IDC_BUTTON_0 - 1000 ? g_i_BUTTON_DOUBLE_SIZE : g_i_BUTTON_SIZE,
-			g_i_BUTTON_SIZE,
+			i == (IDC_BUTTON_0 - 1000) ? g_i_BUTTON_DOUBLE_SIZE : g_i_BUTTON_SIZE,
+			i == (IDC_BUTTON_EQUAL - 1000) ? g_i_BUTTON_DOUBLE_SIZE : g_i_BUTTON_SIZE,
 			LR_SHARED
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
@@ -595,6 +589,7 @@ VOID SetFont(HWND hwnd, INT fontName)
 		font = CreateFont(fontHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Ravie");
 	}
 	if (!font) MessageBox(hwnd, "Font creation failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
+
 	EnumChildWindows(hwnd, (WNDENUMPROC)SetFont, (LPARAM)font);
 }
 
