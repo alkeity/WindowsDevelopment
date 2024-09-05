@@ -7,7 +7,14 @@
 #include "Calculator.h"
 #include <exception>
 
-enum COLOR{ BLUE, GREEN };
+enum COLOR { GREEN, BLUE };
+enum ELEMENT { WINDOW_BACKGROUND, DISPLAY_BACKGROUND, FOREGROUND };
+
+const COLORREF g_COLORS[][3] =
+{
+	{ RGB(75,197,147), RGB(28,73,54), RGB(255, 255, 255) },
+	{ RGB(33,59,154), RGB(0,0,100), RGB(255, 0,0) }
+};
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "Calc_PD_311";
 
@@ -28,11 +35,6 @@ CONST INT g_i_START_Y_BUTTON = g_i_START_Y * 2 + g_i_DISPLAY_HEIGHT;
 CONST INT g_i_START_X_OPERATIONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 3;
 CONST INT g_i_START_X_CONTROL_BUTTONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 4;
 
-CONST COLORREF g_COLORS[][3] =
-{
-	{ RGB(0, 0, 200), RGB(0, 0, 100), RGB(255, 0, 0) },
-	{ RGB(0, 200, 0), RGB(0, 100, 0), RGB(0, 255, 0) },
-};
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 VOID SetSkin(HWND hwnd, LPSTR skinName);
@@ -115,7 +117,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static CONST CHAR skin[MAX_PATH]{};
-	static COLOR colorScheme = COLOR::BLUE;
+	static COLOR colorScheme = COLOR::GREEN;
 
 	switch (uMsg)
 	{
@@ -340,28 +342,33 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		else if (LOWORD(wParam) >= IDM_THEME_DEFAULT && LOWORD(wParam) <= IDM_THEME_BLUE)
 		{
-			//SendMessage(hwnd, WM_THEMECHANGED, 0, 0);
-			//CloseThemeData();
 			LPSTR themeName = NULL;
 
 			switch (LOWORD(wParam))
 			{
 			case IDM_THEME_DEFAULT:
 				themeName = (LPSTR)"themeGreen";
+				colorScheme = COLOR::GREEN;
 				break;
 			case IDM_THEME_BLUE:
 			{
 				themeName = (LPSTR)"themeBlue";
-				HDC hdc = GetDC(hwnd);
-				SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdc, 0);
-				SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)GetDC(GetDlgItem(hwnd, IDC_EDIT_DISPLAY)), 0);
-				ReleaseDC(hwnd, hdc);
+				colorScheme = COLOR::BLUE;
 			}
 				break;
 			default:
 				break;
 			}
 			SetSkinFromDLL(hwnd, themeName);
+
+			HDC hdc = GetDC(hwnd);
+			HDC hdcEdit = GetDC(GetDlgItem(hwnd, IDC_EDIT_DISPLAY));
+			SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdcEdit, 0);
+			ReleaseDC(hwnd, hdcEdit);
+			ReleaseDC(hwnd, hdc);
+			CHAR sz_buffer[MAX_PATH]{};
+			SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_GETTEXT, MAX_PATH, (LPARAM)sz_buffer);
+			SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
 	}
 		break;
@@ -477,13 +484,11 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		HDC hdc = (HDC)wParam;
 		SetBkMode(hdc, OPAQUE);
-		SetBkColor(hdc, RGB(0, 0, 255));
-		HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 200));
-		SetTextColor(hdc, RGB(255, 0, 0));
-
+		SetBkColor(hdc, g_COLORS[colorScheme][ELEMENT::DISPLAY_BACKGROUND]);
+		HBRUSH hBrush = CreateSolidBrush(g_COLORS[colorScheme][ELEMENT::WINDOW_BACKGROUND]);
+		SetTextColor(hdc, g_COLORS[colorScheme][ELEMENT::FOREGROUND]);
 		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrush);
-		//SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
-		//SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETTEXT, 0, (LPARAM)"0");
+		SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
 
 		return (LRESULT)hBrush;
 	}
