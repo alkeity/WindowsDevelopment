@@ -152,6 +152,7 @@
     <Image Include="..\..\WinAPI\Calc\resources\themeGreen\button_7.bmp" />
     <Image Include="..\..\WinAPI\Calc\resources\themeGreen\button_8.bmp" />
     <Image Include="..\..\WinAPI\Calc\resources\themeGreen\button_9.bmp" />
+    <Image Include="F:\guibg.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

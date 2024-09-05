@@ -13,7 +13,7 @@ enum ELEMENT { WINDOW_BACKGROUND, DISPLAY_BACKGROUND, FOREGROUND };
 const COLORREF g_COLORS[][3] =
 {
 	{ RGB(75,197,147), RGB(28,73,54), RGB(255, 255, 255) },
-	{ RGB(33,59,154), RGB(0,0,100), RGB(255, 0,0) }
+	{ RGB(33,59,154), RGB(0,0,100), RGB(255, 255, 255) }
 };
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "Calc_PD_311";
@@ -26,7 +26,7 @@ CONST INT g_i_INTERVAL = 5;
 CONST INT g_i_BUTTON_SIZE = 50;
 CONST INT g_i_BUTTON_DOUBLE_SIZE = g_i_BUTTON_SIZE * 2 + g_i_INTERVAL;
 CONST INT g_i_DISPLAY_WIDTH = (g_i_BUTTON_SIZE + g_i_INTERVAL) * 5;
-CONST INT g_i_DISPLAY_HEIGHT = 25;
+CONST INT g_i_DISPLAY_HEIGHT = 40;
 CONST INT g_i_WINDOW_WIDTH = g_i_DISPLAY_WIDTH + g_i_START_X * 2 + 16;
 CONST INT g_i_WINDOW_HEIGHT = g_i_DISPLAY_HEIGHT + g_i_START_Y * 2 + g_i_BUTTON_SIZE * 4 + g_i_TITLE_HEIGHT + g_i_INTERVAL * 4 + 30;
 
@@ -38,7 +38,7 @@ CONST INT g_i_START_X_CONTROL_BUTTONS = g_i_START_X_BUTTON + (g_i_BUTTON_SIZE + 
 
 INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 VOID SetSkin(HWND hwnd, LPSTR skinName);
-VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName);
+VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName, WPARAM wParam);
 BOOL CALLBACK SetFont(HWND hwnd, LPARAM font);
 VOID SetFont(HWND hwnd, INT fontName);
 
@@ -123,6 +123,19 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
+		HWND staticBg = CreateWindowEx(
+			NULL,
+			"STATIC",
+			NULL,
+			SS_BITMAP | WS_VISIBLE | WS_CHILD,
+			0, 0,
+			g_i_WINDOW_WIDTH, g_i_WINDOW_HEIGHT,
+			hwnd,
+			(HMENU)BG_IMAGE,
+			NULL,
+			NULL
+		);
+
 		HWND hDisplay = CreateWindowEx
 		(
 			NULL, "Edit", "0",
@@ -359,16 +372,17 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			default:
 				break;
 			}
-			SetSkinFromDLL(hwnd, themeName);
 
 			HDC hdc = GetDC(hwnd);
 			HDC hdcEdit = GetDC(GetDlgItem(hwnd, IDC_EDIT_DISPLAY));
 			SendMessage(hwnd, WM_CTLCOLOREDIT, (WPARAM)hdcEdit, 0);
 			ReleaseDC(hwnd, hdcEdit);
 			ReleaseDC(hwnd, hdc);
-			CHAR sz_buffer[MAX_PATH]{};
-			SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_GETTEXT, MAX_PATH, (LPARAM)sz_buffer);
-			SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			CHAR szBuffer[MAX_PATH]{};
+			SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_GETTEXT, MAX_PATH, (LPARAM)szBuffer);
+			SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETTEXT, 0, (LPARAM)szBuffer);
+
+			SetSkinFromDLL(hwnd, themeName, wParam);
 		}
 	}
 		break;
@@ -490,6 +504,15 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrush);
 		SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
 
+
+		HINSTANCE hSkin;
+		if (colorScheme == COLOR::GREEN) hSkin = LoadLibrary("resources/SkinGreen.dll");
+		else hSkin = LoadLibrary("resources/SkinBlue.dll");
+		HWND hBg = GetDlgItem(hwnd, BG_IMAGE);
+		HBITMAP hImage = (HBITMAP)LoadImage(hSkin, MAKEINTRESOURCE(1000), IMAGE_BITMAP, g_i_WINDOW_WIDTH, g_i_WINDOW_HEIGHT, LR_SHARED);
+		SendMessage(hBg, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
+		FreeLibrary(hSkin);
+
 		return (LRESULT)hBrush;
 	}
 
@@ -514,8 +537,16 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case CM_THEME_BLUE: SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_BLUE), 0); break;
 		case CM_THEME_GREEN: SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0); break;
-		case CM_FONT_DIGITAL7: SetFont(hwnd, CM_FONT_DIGITAL7); break;
-		case CM_FONT_RAVIE: SetFont(hwnd, CM_FONT_RAVIE); break;
+		case CM_FONT_DIGITAL7:
+			SetFont(hwnd, CM_FONT_DIGITAL7);
+			if (colorScheme == COLOR::GREEN) SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0);
+			else SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_BLUE), 0);
+			break;
+		case CM_FONT_RAVIE:
+			SetFont(hwnd, CM_FONT_RAVIE);
+			if (colorScheme == COLOR::GREEN) SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_DEFAULT), 0);
+			else SendMessage(hwnd, WM_COMMAND, LOWORD(IDM_THEME_BLUE), 0);
+			break;
 		case CM_EXIT: SendMessage(hwnd, WM_CLOSE, 0, 0); break;
 		default: break;
 		}
@@ -554,10 +585,11 @@ VOID SetSkin(HWND hwnd, LPSTR skinName)
 	}
 }
 
-VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName)
+VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName, WPARAM wParam)
 {
 	HWND hButton;
 	HINSTANCE hButtons;
+	HBITMAP hImage;
 
 	if (skinName == "themeBlue") hButtons = LoadLibrary("resources/SkinBlue.dll");
 	else hButtons = LoadLibrary("resources/SkinGreen.dll");
@@ -565,7 +597,7 @@ VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName)
 	for (size_t i = 0; i <= 17; i++)
 	{
 		hButton = GetDlgItem(hwnd, i + 1000);
-		HBITMAP hImage = (HBITMAP)LoadImage(
+		hImage = (HBITMAP)LoadImage(
 			hButtons, MAKEINTRESOURCE(100 + i), IMAGE_BITMAP,
 			i == (IDC_BUTTON_0 - 1000) ? g_i_BUTTON_DOUBLE_SIZE : g_i_BUTTON_SIZE,
 			i == (IDC_BUTTON_EQUAL - 1000) ? g_i_BUTTON_DOUBLE_SIZE : g_i_BUTTON_SIZE,
@@ -573,6 +605,10 @@ VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName)
 		);
 		SendMessage(hButton, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
 	}
+
+	/*HWND hBg = GetDlgItem(hwnd, BG_IMAGE);
+	hImage = (HBITMAP)LoadImage(hButtons, MAKEINTRESOURCE(1000), IMAGE_BITMAP, g_i_WINDOW_WIDTH, g_i_WINDOW_HEIGHT, LR_SHARED);
+	SendMessage(hBg, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);*/
 	FreeLibrary(hButtons);
 }
 
@@ -580,7 +616,8 @@ VOID SetFont(HWND hwnd, INT fontName)
 {
 	HFONT font;
 	HDC hdc = GetDC(NULL);
-	LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	//LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	LONG fontHeight = 40;
 	ReleaseDC(NULL, hdc);
 
 
@@ -595,11 +632,12 @@ VOID SetFont(HWND hwnd, INT fontName)
 	}
 	if (!font) MessageBox(hwnd, "Font creation failed!", "Error", MB_OK | MB_ICONEXCLAMATION);
 
-	EnumChildWindows(hwnd, (WNDENUMPROC)SetFont, (LPARAM)font);
+	SendMessage(GetDlgItem(hwnd, IDC_EDIT_DISPLAY), WM_SETFONT, (LPARAM)font, TRUE);
+	//EnumChildWindows(hwnd, (WNDENUMPROC)SetFont, (LPARAM)font);
 }
 
-BOOL CALLBACK SetFont(HWND hwnd, LPARAM font)
-{
-	SendMessage(hwnd, WM_SETFONT, font, TRUE);
-	return TRUE;
-}
+//BOOL CALLBACK SetFont(HWND hwnd, LPARAM font)
+//{
+//	SendMessage(hwnd, WM_SETFONT, font, TRUE);
+//	return TRUE;
+//}

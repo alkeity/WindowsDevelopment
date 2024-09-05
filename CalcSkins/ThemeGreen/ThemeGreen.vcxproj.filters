@@ -55,5 +55,8 @@
     <Image Include="..\..\WinAPI\Calc\resources\themeGreen\button_9.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="F:\guibg.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

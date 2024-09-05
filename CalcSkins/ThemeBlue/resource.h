@@ -12,7 +12,6 @@
 #define IDB_BUTTON_7                    107
 #define IDB_BUTTON_8                    108
 #define IDB_BUTTON_9                    109
-
 #define IDB_BUTTON_POINT                110
 #define IDB_BUTTON_PLUS                 111
 #define IDB_BUTTON_MINUS                112
@@ -22,12 +21,13 @@
 #define IDB_BUTTON_CLEAR                116
 #define IDB_BUTTON_EQUAL                117
 
+#define IDB_BACKGROUND                  1000
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        120
+#define _APS_NEXT_RESOURCE_VALUE        121
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
