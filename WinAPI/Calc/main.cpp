@@ -41,6 +41,7 @@ VOID SetSkin(HWND hwnd, LPSTR skinName);
 VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName, WPARAM wParam);
 BOOL CALLBACK SetFont(HWND hwnd, LPARAM font);
 VOID SetFont(HWND hwnd, INT fontName);
+HINSTANCE LoadLibrarySp(LPCSTR lpLibFileName);
 
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
@@ -504,10 +505,9 @@ INT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrush);
 		SendMessage(hwnd, WM_ERASEBKGND, wParam, 0);
 
-
 		HINSTANCE hSkin;
-		if (colorScheme == COLOR::GREEN) hSkin = LoadLibrary("resources/SkinGreen.dll");
-		else hSkin = LoadLibrary("resources/SkinBlue.dll");
+		if (colorScheme == COLOR::GREEN) hSkin = LoadLibrarySp("SkinGreen.dll");
+		else hSkin = LoadLibrarySp("SkinBlue.dll");
 		HWND hBg = GetDlgItem(hwnd, BG_IMAGE);
 		HBITMAP hImage = (HBITMAP)LoadImage(hSkin, MAKEINTRESOURCE(1000), IMAGE_BITMAP, g_i_WINDOW_WIDTH, g_i_WINDOW_HEIGHT, LR_SHARED);
 		SendMessage(hBg, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hImage);
@@ -591,8 +591,8 @@ VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName, WPARAM wParam)
 	HINSTANCE hButtons;
 	HBITMAP hImage;
 
-	if (skinName == "themeBlue") hButtons = LoadLibrary("resources/SkinBlue.dll");
-	else hButtons = LoadLibrary("resources/SkinGreen.dll");
+	if (skinName == "themeBlue") hButtons = LoadLibrarySp("SkinBlue.dll");
+	else hButtons = LoadLibrarySp("SkinGreen.dll");
 
 	for (size_t i = 0; i <= 17; i++)
 	{
@@ -641,3 +641,11 @@ VOID SetFont(HWND hwnd, INT fontName)
 //	SendMessage(hwnd, WM_SETFONT, font, TRUE);
 //	return TRUE;
 //}
+
+HINSTANCE LoadLibrarySp(LPCSTR lpLibFileName)
+{
+	CHAR source[256] = "resources\\";
+	strcat_s(source, 256, lpLibFileName);
+
+	return LoadLibrary(source);
+}
