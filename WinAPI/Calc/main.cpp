@@ -615,10 +615,10 @@ VOID SetSkinFromDLL(HWND hwnd, LPSTR skinName, WPARAM wParam)
 VOID SetFont(HWND hwnd, INT fontName)
 {
 	HFONT font;
-	HDC hdc = GetDC(NULL);
+	//HDC hdc = GetDC(NULL);
 	//LONG fontHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	//ReleaseDC(NULL, hdc);
 	LONG fontHeight = 40;
-	ReleaseDC(NULL, hdc);
 
 
 	if (fontName == CM_FONT_DIGITAL7)
