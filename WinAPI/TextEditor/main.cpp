@@ -98,7 +98,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HWND hEdit = CreateWindowEx
 		(
 			NULL, "Edit", "Workspace",
-			WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL,
+			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_AUTOVSCROLL,
 			0, 0,
 			winWidth, winHeight,
 			hwnd, (HMENU)IDC_EDIT,
