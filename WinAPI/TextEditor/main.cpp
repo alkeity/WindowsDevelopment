@@ -108,6 +108,19 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_COMMAND:
 		break;
+	case WM_SIZING:
+	case WM_SIZE:
+	case WM_MOVE:
+	case WM_MOVING:
+	{
+		HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+		RECT clientRect;
+		GetClientRect(hwnd, &clientRect);
+		INT winHeight = clientRect.bottom - clientRect.top;
+		INT winWidth = clientRect.right - clientRect.left;
+		SetWindowPos(hEdit, HWND_TOP, clientRect.left, clientRect.top, winWidth, winHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
+	}
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
