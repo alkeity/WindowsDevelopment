@@ -1,10 +1,11 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 #undef UNICODE
 #include<Windows.h>
+#include<Richedit.h>
 #include<iostream>
 #include"resource.h"
 
-#define CONSOLE_DEBUG
+//#define CONSOLE_DEBUG
 
 using std::cout;
 using std::endl;
@@ -13,6 +14,10 @@ CONST CHAR g_sz_WINDOW_CLASS[] = "TextEditor_PD311";
 
 BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 CHAR* FormatLastError();
+BOOL LoadTextFile(HWND hEdit, LPCSTR lpszFileName);
+BOOL SaveTextFile(HWND hEdit, LPCSTR lpszFileName);
+
+
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
 #ifdef CONSOLE_DEBUG
@@ -87,6 +92,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 
 BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static HINSTANCE hRichEdit20 = LoadLibrary("RichEd20.dll");
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -97,31 +103,57 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		INT winWidth = clientRect.right - clientRect.left;
 		HWND hEdit = CreateWindowEx
 		(
-			NULL, "Edit", "Workspace",
+			NULL, RICHEDIT_CLASS, "Workspace",
 			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_AUTOVSCROLL,
-			0, 0,
-			winWidth, winHeight,
+			30, 30,
+			winWidth - 60, winHeight - 60,
 			hwnd, (HMENU)IDC_EDIT,
 			NULL, NULL
 			);
 	}
 		break;
 	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_FILE_OPEN:
+		{
+			CHAR szFileName[MAX_PATH]{};
+
+			OPENFILENAME ofn;
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = hwnd;
+			ofn.lpstrFilter = "Text files: (*.txt)\0*.txt\0All files (*.*)\0*.*\0";
+			ofn.lpstrDefExt = "txt";
+			ofn.nMaxFile = MAX_PATH;
+			ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+			ofn.lpstrFile = szFileName;
+
+			if (GetOpenFileName(&ofn))
+			{
+				HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+				LoadTextFile(hEdit, szFileName);
+			}
+		}
+			break;
+		default:
+			break;
+		}
 		break;
-	case WM_SIZING:
 	case WM_SIZE:
-	case WM_MOVE:
-	case WM_MOVING:
 	{
-		HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
 		RECT clientRect;
 		GetClientRect(hwnd, &clientRect);
-		INT winHeight = clientRect.bottom - clientRect.top;
-		INT winWidth = clientRect.right - clientRect.left;
-		SetWindowPos(hEdit, HWND_TOP, clientRect.left, clientRect.top, winWidth, winHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
+		SetWindowPos(
+			GetDlgItem(hwnd, IDC_EDIT), HWND_TOP,
+			clientRect.left + 30, clientRect.top + 30,
+			clientRect.right - clientRect.left - 60, clientRect.bottom - clientRect.top - 60,
+			SWP_SHOWWINDOW | SWP_NOZORDER
+		);
 	}
 		break;
 	case WM_DESTROY:
+		FreeLibrary(hRichEdit20);
 		PostQuitMessage(0);
 		break;
 	case WM_CLOSE:
@@ -143,4 +175,56 @@ CHAR* FormatLastError()
 		0, NULL
 	);
 	return lpszBuffer;
+}
+
+BOOL LoadTextFile(HWND hEdit, LPCSTR lpszFileName)
+{
+	BOOL bSuccess = FALSE;
+	HANDLE hFile = CreateFile(lpszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		DWORD dwFileSize = GetFileSize(hFile, NULL);
+		if (dwFileSize != UINT_MAX)
+		{
+			LPSTR lpszFileText = (LPSTR)GlobalAlloc(GPTR, dwFileSize + 1);
+			if (lpszFileText)
+			{
+				DWORD dwRead = 0;
+				if (ReadFile(hFile, lpszFileText, dwFileSize, &dwRead, NULL))
+				{
+					if (SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)lpszFileText)) bSuccess = TRUE;
+				}
+				GlobalFree(lpszFileText);
+			}
+			CloseHandle(hFile);
+		}
+	}
+	return bSuccess;
+}
+
+BOOL SaveTextFile(HWND hEdit, LPCSTR lpszFileName)
+{
+	BOOL bSuccess = FALSE;
+	HANDLE hFile = CreateFile(lpszFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		DWORD dwTextLen = SendMessage(hEdit, WM_GETTEXTLENGTH, 0, 0);
+		if (dwTextLen)
+		{
+			LPSTR lpszText = (LPSTR)GlobalAlloc(GPTR, dwTextLen + 1);
+			if (lpszText)
+			{
+				if (SendMessage(hEdit, WM_GETTEXT, dwTextLen + 1, (LPARAM)lpszText))
+				{
+					DWORD dwWrite;
+					if (WriteFile(hFile, lpszText, dwTextLen, &dwWrite, NULL)) bSuccess = TRUE;
+				}
+				GlobalFree(lpszText);
+			}
+		}
+		CloseHandle(hFile);
+	}
+	return bSuccess;
 }
