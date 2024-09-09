@@ -93,6 +93,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE hRichEdit20 = LoadLibrary("RichEd20.dll");
+	static BOOLEAN isWordWrap = TRUE;
+
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -136,10 +138,37 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 			break;
+		case ID_FORMAT_WORDWRAP:
+		{
+			RECT clientRect;
+			GetClientRect(hwnd, &clientRect);
+			HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+
+			if (isWordWrap)
+			{
+				SetWindowLongPtr(hEdit, GWL_STYLE, WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL);
+				isWordWrap = FALSE;
+			}
+			else
+			{
+				SetWindowLongPtr(hEdit, GWL_STYLE, WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_AUTOVSCROLL);
+				isWordWrap = TRUE;
+			}
+			// TODO: repaint doesn't really works... same with horisontal scroll
+			MoveWindow
+			(
+				hEdit, clientRect.left + 30, clientRect.top + 30,
+				clientRect.right - clientRect.left - 60,
+				clientRect.bottom - clientRect.top - 60,
+				TRUE
+			);
+		}
+			break;
 		default:
 			break;
 		}
 		break;
+
 	case WM_SIZE:
 	{
 		RECT clientRect;
