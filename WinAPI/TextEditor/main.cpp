@@ -138,6 +138,32 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 			break;
+		case ID_FILE_SAVE:
+		{
+			//
+		}
+			break;
+		case ID_FILE_SAVEAS:
+		{
+			CHAR szFileName[MAX_PATH]{};
+
+			OPENFILENAME ofn;
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = hwnd;
+			ofn.lpstrFilter = "Text files: (*.txt)\0*.txt\0All files (*.*)\0*.*\0";
+			ofn.lpstrDefExt = "txt";
+			ofn.nMaxFile = MAX_PATH;
+			ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+			ofn.lpstrFile = szFileName;
+
+			if (GetSaveFileName(&ofn))
+			{
+				HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+				SaveTextFile(hEdit, szFileName);
+			}
+		}
+			break;
 		case ID_FORMAT_WORDWRAP:
 		{
 			RECT clientRect;
