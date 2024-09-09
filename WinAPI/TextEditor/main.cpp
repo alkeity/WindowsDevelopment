@@ -95,6 +95,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HINSTANCE hRichEdit20 = LoadLibrary("RichEd20.dll");
 	static BOOLEAN isWordWrap = TRUE;
 	static CHAR szFileName[MAX_PATH]{};
+	static BOOLEAN isSaved = TRUE;
 
 	switch (uMsg)
 	{
@@ -112,14 +113,33 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			winWidth - 60, winHeight - 60,
 			hwnd, (HMENU)IDC_EDIT,
 			NULL, NULL
-			);
+		);
+		SendMessage(hEdit, EM_SETEVENTMASK, 0, ENM_CHANGE);
 	}
 		break;
 	case WM_COMMAND:
+		if (HIWORD(wParam) == EN_CHANGE)
+		{
+			isSaved = FALSE;
+			break;
+		}
 		switch (LOWORD(wParam))
 		{
 		case ID_FILE_OPEN:
 		{
+			BOOLEAN isCancel = TRUE;
+			if (!isSaved)
+			{
+				switch (MessageBox(hwnd, "Сохранить файл?", "Файл был изменен", MB_YESNOCANCEL | MB_ICONQUESTION))
+				{
+				case IDOK: SendMessage(hwnd, WM_COMMAND, ID_FILE_SAVE, 0); break;
+				case IDNO: break;
+				case IDCANCEL: isCancel = FALSE; break;
+				default: break;
+				}
+			}
+			if (isCancel) break;
+
 			OPENFILENAME ofn;
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof(ofn);
@@ -130,11 +150,19 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 			ofn.lpstrFile = szFileName;
 
-			if (GetOpenFileName(&ofn)) LoadTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+			if (GetOpenFileName(&ofn))
+			{
+				HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+				LoadTextFile(hEdit, szFileName);
+			}
 		}
 			break;
 		case ID_FILE_SAVE:
-			if (strlen(szFileName)) SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+			if (strlen(szFileName))
+			{
+				SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+				isSaved = TRUE;
+			}
 			else SendMessage(hwnd, WM_COMMAND, ID_FILE_SAVEAS, 0);
 			break;
 		case ID_FILE_SAVEAS:
@@ -148,7 +176,11 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			ofn.nMaxFile = MAX_PATH;
 			ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 			ofn.lpstrFile = szFileName;
-			if (GetSaveFileName(&ofn)) SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+			if (GetSaveFileName(&ofn))
+			{
+				SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+				isSaved = TRUE;
+			}
 		}
 			break;
 		case ID_FORMAT_WORDWRAP:
