@@ -5,7 +5,7 @@
 #include<iostream>
 #include"resource.h"
 
-//#define CONSOLE_DEBUG
+#define CONSOLE_DEBUG
 
 using std::cout;
 using std::endl;
@@ -94,6 +94,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE hRichEdit20 = LoadLibrary("RichEd20.dll");
 	static BOOLEAN isWordWrap = TRUE;
+	static CHAR szFileName[MAX_PATH]{};
 
 	switch (uMsg)
 	{
@@ -119,49 +120,35 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case ID_FILE_OPEN:
 		{
-			CHAR szFileName[MAX_PATH]{};
-
 			OPENFILENAME ofn;
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof(ofn);
 			ofn.hwndOwner = hwnd;
-			ofn.lpstrFilter = "Text files: (*.txt)\0*.txt\0All files (*.*)\0*.*\0";
+			ofn.lpstrFilter = "Text files: (*.txt)\0*.txt\0C++ files: (*.cpp, *.h)\0*.cpp;*.h\0All files (*.*)\0*.*\0";
 			ofn.lpstrDefExt = "txt";
 			ofn.nMaxFile = MAX_PATH;
 			ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 			ofn.lpstrFile = szFileName;
 
-			if (GetOpenFileName(&ofn))
-			{
-				HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
-				LoadTextFile(hEdit, szFileName);
-			}
+			if (GetOpenFileName(&ofn)) LoadTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
 		}
 			break;
 		case ID_FILE_SAVE:
-		{
-			//
-		}
+			if (strlen(szFileName)) SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+			else SendMessage(hwnd, WM_COMMAND, ID_FILE_SAVEAS, 0);
 			break;
 		case ID_FILE_SAVEAS:
 		{
-			CHAR szFileName[MAX_PATH]{};
-
 			OPENFILENAME ofn;
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof(ofn);
 			ofn.hwndOwner = hwnd;
-			ofn.lpstrFilter = "Text files: (*.txt)\0*.txt\0All files (*.*)\0*.*\0";
+			ofn.lpstrFilter = "Text files: (*.txt)\0*.txt\0C++ files: (*.cpp, *.h)\0*.cpp;*.h\0All files (*.*)\0*.*\0";
 			ofn.lpstrDefExt = "txt";
 			ofn.nMaxFile = MAX_PATH;
-			ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+			ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 			ofn.lpstrFile = szFileName;
-
-			if (GetSaveFileName(&ofn))
-			{
-				HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
-				SaveTextFile(hEdit, szFileName);
-			}
+			if (GetSaveFileName(&ofn)) SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
 		}
 			break;
 		case ID_FORMAT_WORDWRAP:
@@ -180,14 +167,8 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SetWindowLongPtr(hEdit, GWL_STYLE, WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_AUTOVSCROLL);
 				isWordWrap = TRUE;
 			}
-			// TODO: repaint doesn't really works... same with horisontal scroll
-			MoveWindow
-			(
-				hEdit, clientRect.left + 30, clientRect.top + 30,
-				clientRect.right - clientRect.left - 60,
-				clientRect.bottom - clientRect.top - 60,
-				TRUE
-			);
+			InvalidateRect(hEdit, NULL, TRUE);
+			UpdateWindow(hwnd);
 		}
 			break;
 		default:
