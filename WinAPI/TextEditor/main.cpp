@@ -5,7 +5,7 @@
 #include<iostream>
 #include"resource.h"
 
-#define CONSOLE_DEBUG
+//#define CONSOLE_DEBUG
 
 using std::cout;
 using std::endl;
@@ -16,6 +16,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 CHAR* FormatLastError();
 BOOL LoadTextFile(HWND hEdit, LPCSTR lpszFileName);
 BOOL SaveTextFile(HWND hEdit, LPCSTR lpszFileName);
+BOOL ModifyWindowName(HWND hwnd, BOOL isSaved, BOOL isAster);
 
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
@@ -93,9 +94,10 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HINSTANCE hRichEdit20 = LoadLibrary("RichEd20.dll");
-	static BOOLEAN isWordWrap = TRUE;
+	static BOOL isWordWrap = TRUE;
 	static CHAR szFileName[MAX_PATH]{};
-	static BOOLEAN isSaved = TRUE;
+	static BOOL isSaved = TRUE;
+	static BOOL isAster = FALSE;
 
 	switch (uMsg)
 	{
@@ -121,6 +123,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (HIWORD(wParam) == EN_CHANGE)
 		{
 			isSaved = FALSE;
+			isAster = ModifyWindowName(hwnd, isSaved, isAster);
 			break;
 		}
 		switch (LOWORD(wParam))
@@ -162,6 +165,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
 				isSaved = TRUE;
+				isAster = ModifyWindowName(hwnd, isSaved, isAster);
 			}
 			else SendMessage(hwnd, WM_COMMAND, ID_FILE_SAVEAS, 0);
 			break;
@@ -180,6 +184,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
 				isSaved = TRUE;
+				isAster = ModifyWindowName(hwnd, isSaved, isAster);
 			}
 		}
 			break;
@@ -296,3 +301,27 @@ BOOL SaveTextFile(HWND hEdit, LPCSTR lpszFileName)
 	}
 	return bSuccess;
 }
+
+BOOL ModifyWindowName(HWND hwnd, BOOL isSaved, BOOL isAster)
+{
+	if (isSaved == isAster)
+	{
+		const INT SIZE = 256;
+		CHAR winName[SIZE]{};
+		SendMessage(hwnd, WM_GETTEXT, SIZE, (LPARAM)winName);
+		if (!isSaved)
+		{
+			strcat_s(winName, SIZE, "*");
+			SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)winName);
+			return TRUE;
+		}
+		else if (isSaved)
+		{
+			winName[strlen(winName) - 1] = '\0';
+			SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)winName);
+			return FALSE;
+		}
+	}
+	return isAster;
+}
+
