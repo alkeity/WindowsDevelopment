@@ -26,6 +26,7 @@ VOID SetWindowName(HWND hwnd, CHAR fileName[]);
 VOID SetStatusBarDimensions(HWND hStatus, INT winWidth);
 VOID SetStatusBar(HWND hStatus, CHAR filePath[]);
 VOID SetStatusBarOnChange(HWND hwnd);
+VOID SetStatusBarWindowSize(HWND hStatus, INT winWidth, INT winHeight);
 
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
@@ -137,6 +138,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		statusHeight = statusRect.bottom - statusRect.top;
 		SetStatusBarDimensions(hStatus, winWidth);
 		SetStatusBar(hwnd, (CHAR*)"None");
+		SetStatusBarWindowSize(hStatus, winWidth, winHeight);
 
 		// edit control edition
 		HWND hEdit = CreateWindowEx
@@ -258,17 +260,19 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		RECT clientRect;
 		GetClientRect(hwnd, &clientRect);
 		INT winWidth = clientRect.right - clientRect.left;
+		INT winHeight = clientRect.bottom - clientRect.top;
 		HWND hStatus = GetDlgItem(hwnd, IDC_STATUSBAR);
 
 		SetWindowPos(
 			GetDlgItem(hwnd, IDC_EDIT), HWND_TOP,
 			clientRect.left + dw_INDENT, clientRect.top + dw_INDENT,
 			winWidth - dw_INDENT * 2,
-			clientRect.bottom - clientRect.top - (dw_INDENT * 2 + statusHeight),
+			winHeight - (dw_INDENT * 2 + statusHeight),
 			SWP_SHOWWINDOW | SWP_NOZORDER
 		);
 		SetStatusBarDimensions(hStatus, winWidth);
 		MoveWindow(hStatus, 0, 0, 0, 0 , TRUE);
+		SetStatusBarWindowSize(hStatus, winWidth, winHeight);
 	}
 		break;
 	case WM_DESTROY:
@@ -403,6 +407,13 @@ VOID SetStatusBarOnChange(HWND hwnd)
 	SendMessage(hStatus, SB_SETTEXT, 1, (LPARAM)"Изменен");
 	sprintf(szBuffer, "Количество слов: %i", GetWordCount(GetDlgItem(hwnd, IDC_EDIT)));
 	SendMessage(hStatus, SB_SETTEXT, 2, (LPARAM)szBuffer);
+}
+
+VOID SetStatusBarWindowSize(HWND hStatus, INT winWidth, INT winHeight)
+{
+	CHAR szBuffer[g_SIZE]{};
+	sprintf(szBuffer, "%i x %i", winWidth, winHeight);
+	SendMessage(hStatus, SB_SETTEXT, 3, (LPARAM)szBuffer);
 }
 
 INT GetWordCount(HWND hEdit)
