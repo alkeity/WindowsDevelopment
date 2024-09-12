@@ -6,22 +6,23 @@
 #include<iostream>
 #include"resource.h"
 
-#define CONSOLE_DEBUG
+//#define CONSOLE_DEBUG
 
 using std::cout;
 using std::endl;
 
 CONST CHAR g_sz_WINDOW_CLASS[] = "TextEditor_PD311";
-const INT g_SIZE = 256;
+CONST INT g_SIZE = 256;
 
-CONST DWORD dw_INDENT = 30;
+CONST DWORD g_dw_INDENT = 30;
 
 BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 CHAR* FormatLastError();
 INT GetWordCount(HWND hEdit);
-BOOL LoadTextFile(HWND hEdit, LPCSTR lpszFileName);
-BOOL SaveTextFile(HWND hEdit, LPCSTR lpszFileName);
+BOOL LoadTextFile(HWND hwnd, LPCSTR lpszFileName);
+BOOL SaveTextFile(HWND hwnd, LPCSTR lpszFileName);
 BOOL ModifyWindowName(HWND hwnd, BOOL isSaved, BOOL isAster);
+BOOL SetFileInfoToStatusBar(HWND hwnd, LPCSTR lpszFileName);
 VOID SetWindowName(HWND hwnd, CHAR fileName[]);
 VOID SetStatusBarDimensions(HWND hStatus, INT winWidth);
 VOID SetStatusBar(HWND hStatus, CHAR filePath[]);
@@ -35,6 +36,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 	setlocale(LC_ALL, "");
+	system("chcp 1251");
 #endif
 
 	WNDCLASSEX wClass;
@@ -145,8 +147,8 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		(
 			NULL, RICHEDIT_CLASS, "",
 			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_LEFT | ES_AUTOVSCROLL,
-			dw_INDENT, dw_INDENT,
-			winWidth - dw_INDENT * 2, winHeight - (dw_INDENT * 2 + statusHeight),
+			g_dw_INDENT, g_dw_INDENT,
+			winWidth - g_dw_INDENT * 2, winHeight - (g_dw_INDENT * 2 + statusHeight),
 			hwnd, (HMENU)IDC_EDIT,
 			NULL, NULL
 		);
@@ -190,8 +192,8 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (GetOpenFileName(&ofn))
 			{
-				HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
-				LoadTextFile(hEdit, szFileName);
+				LoadTextFile(hwnd, szFileName);
+				SetFileInfoToStatusBar(hwnd, szFileName);
 				SetStatusBar(hwnd, ofn.lpstrFile);
 				SetWindowName(hwnd, szFileName);
 				isSaved = TRUE;
@@ -202,7 +204,8 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case ID_FILE_SAVE:
 			if (strlen(szFileName))
 			{
-				SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+				SaveTextFile(hwnd, szFileName);
+				SetFileInfoToStatusBar(hwnd, szFileName);
 				isSaved = TRUE;
 				isAster = ModifyWindowName(hwnd, isSaved, isAster);
 			}
@@ -222,7 +225,8 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (GetSaveFileName(&ofn))
 			{
-				SaveTextFile(GetDlgItem(hwnd, IDC_EDIT), szFileName);
+				SaveTextFile(hwnd, szFileName);
+				SetFileInfoToStatusBar(hwnd, szFileName);
 				isSaved = TRUE;
 				isAster = ModifyWindowName(hwnd, isSaved, isAster);
 				SetStatusBar(hwnd, ofn.lpstrFile);
@@ -265,9 +269,9 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		SetWindowPos(
 			GetDlgItem(hwnd, IDC_EDIT), HWND_TOP,
-			clientRect.left + dw_INDENT, clientRect.top + dw_INDENT,
-			winWidth - dw_INDENT * 2,
-			winHeight - (dw_INDENT * 2 + statusHeight),
+			clientRect.left + g_dw_INDENT, clientRect.top + g_dw_INDENT,
+			winWidth - g_dw_INDENT * 2,
+			winHeight - (g_dw_INDENT * 2 + statusHeight),
 			SWP_SHOWWINDOW | SWP_NOZORDER
 		);
 		SetStatusBarDimensions(hStatus, winWidth);
@@ -301,8 +305,9 @@ CHAR* FormatLastError()
 	return lpszBuffer;
 }
 
-BOOL LoadTextFile(HWND hEdit, LPCSTR lpszFileName)
+BOOL LoadTextFile(HWND hwnd, LPCSTR lpszFileName)
 {
+	HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
 	BOOL bSuccess = FALSE;
 	HANDLE hFile = CreateFile(lpszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
 
@@ -327,8 +332,9 @@ BOOL LoadTextFile(HWND hEdit, LPCSTR lpszFileName)
 	return bSuccess;
 }
 
-BOOL SaveTextFile(HWND hEdit, LPCSTR lpszFileName)
+BOOL SaveTextFile(HWND hwnd, LPCSTR lpszFileName)
 {
+	HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
 	BOOL bSuccess = FALSE;
 	HANDLE hFile = CreateFile(lpszFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -349,6 +355,30 @@ BOOL SaveTextFile(HWND hEdit, LPCSTR lpszFileName)
 			}
 		}
 		CloseHandle(hFile);
+	}
+	return bSuccess;
+}
+
+BOOL SetFileInfoToStatusBar(HWND hwnd, LPCSTR lpszFileName)
+{
+	// TODO convert time to local, i've no time rn
+	BOOL bSuccess = FALSE;
+	HWND hStatus = GetDlgItem(hwnd, IDC_STATUSBAR);
+	SYSTEMTIME date;
+	CHAR szBuffer[g_SIZE]{};
+	WIN32_FILE_ATTRIBUTE_DATA fData;
+	if (GetFileAttributesEx(lpszFileName, GetFileExInfoStandard, &fData))
+	{
+		sprintf(szBuffer, "Размер: %i байт", fData.nFileSizeLow);
+		SendMessage(hStatus, SB_SETTEXT, 4, (LPARAM)szBuffer);
+
+		FileTimeToSystemTime(&fData.ftCreationTime, &date);
+		sprintf(szBuffer, "Создан: %02d:%02d %02d.%02d.%02d", date.wMonth, date.wMinute, date.wDay, date.wMonth, date.wYear);
+		SendMessage(hStatus, SB_SETTEXT, 5, (LPARAM)szBuffer);
+
+		FileTimeToSystemTime(&fData.ftLastWriteTime, &date);
+		sprintf(szBuffer, "Изменен: %02d:%02d %02d.%02d.%02d", date.wMonth, date.wMinute, date.wDay, date.wMonth, date.wYear);
+		SendMessage(hStatus, SB_SETTEXT, 6, (LPARAM)szBuffer);
 	}
 	return bSuccess;
 }
@@ -384,7 +414,7 @@ VOID SetWindowName(HWND hwnd, CHAR fileName[])
 
 VOID SetStatusBarDimensions(HWND hStatus, INT winWidth)
 {
-	INT elemPos[] = { winWidth * 0.4, winWidth * 0.5, winWidth * 0.6, winWidth * 0.7, winWidth * 0.8, winWidth * 0.9, -1 };
+	INT elemPos[] = { winWidth * 0.35, winWidth * 0.4, winWidth * 0.51, winWidth * 0.58, winWidth * 0.7, winWidth * 0.85, -1 };
 	SendMessage(hStatus, SB_SETPARTS, sizeof(elemPos) / sizeof(elemPos[0]), (LPARAM)elemPos);
 }
 
