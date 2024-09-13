@@ -23,6 +23,7 @@ BOOL LoadTextFile(HWND hwnd, LPCSTR lpszFileName);
 BOOL SaveTextFile(HWND hwnd, LPCSTR lpszFileName);
 BOOL ModifyWindowName(HWND hwnd, BOOL isSaved, BOOL isAster);
 BOOL SetFileInfoToStatusBar(HWND hwnd, LPCSTR lpszFileName);
+VOID FormatFileTime(FILETIME fileTime, CHAR szBuffer[], CONST CHAR szMessage[]);
 VOID SetWindowName(HWND hwnd, CHAR fileName[]);
 VOID SetStatusBarDimensions(HWND hStatus, INT winWidth);
 VOID SetStatusBar(HWND hStatus, CHAR filePath[]);
@@ -361,26 +362,39 @@ BOOL SaveTextFile(HWND hwnd, LPCSTR lpszFileName)
 
 BOOL SetFileInfoToStatusBar(HWND hwnd, LPCSTR lpszFileName)
 {
-	// TODO convert time to local, i've no time rn
 	BOOL bSuccess = FALSE;
 	HWND hStatus = GetDlgItem(hwnd, IDC_STATUSBAR);
-	SYSTEMTIME date;
+	SYSTEMTIME sysTime;
 	CHAR szBuffer[g_SIZE]{};
 	WIN32_FILE_ATTRIBUTE_DATA fData;
+
+	ZeroMemory(&fData, sizeof(fData));
+	ZeroMemory(&szBuffer, sizeof(szBuffer));
+	ZeroMemory(&sysTime, sizeof(sysTime));
 	if (GetFileAttributesEx(lpszFileName, GetFileExInfoStandard, &fData))
 	{
 		sprintf(szBuffer, "Размер: %i байт", fData.nFileSizeLow);
 		SendMessage(hStatus, SB_SETTEXT, 4, (LPARAM)szBuffer);
 
-		FileTimeToSystemTime(&fData.ftCreationTime, &date);
-		sprintf(szBuffer, "Создан: %02d:%02d %02d.%02d.%02d", date.wMonth, date.wMinute, date.wDay, date.wMonth, date.wYear);
+		FormatFileTime(fData.ftCreationTime, szBuffer, "Создан");
 		SendMessage(hStatus, SB_SETTEXT, 5, (LPARAM)szBuffer);
 
-		FileTimeToSystemTime(&fData.ftLastWriteTime, &date);
-		sprintf(szBuffer, "Изменен: %02d:%02d %02d.%02d.%02d", date.wMonth, date.wMinute, date.wDay, date.wMonth, date.wYear);
+		FormatFileTime(fData.ftLastWriteTime, szBuffer, "Изменен");
 		SendMessage(hStatus, SB_SETTEXT, 6, (LPARAM)szBuffer);
 	}
 	return bSuccess;
+}
+
+VOID FormatFileTime(FILETIME fileTime, CHAR szBuffer[], CONST CHAR szMessage[])
+{
+	SYSTEMTIME sysTime;
+	ZeroMemory(&sysTime, sizeof(sysTime));
+	FILETIME localTime;
+	ZeroMemory(&localTime, sizeof(localTime));
+
+	FileTimeToLocalFileTime(&fileTime, &localTime);
+	FileTimeToSystemTime(&localTime, &sysTime);
+	sprintf(szBuffer, "%s: %02d:%02d %02d.%02d.%02d", szMessage, sysTime.wHour, sysTime.wMinute, sysTime.wDay, sysTime.wMonth, sysTime.wYear);
 }
 
 BOOL ModifyWindowName(HWND hwnd, BOOL isSaved, BOOL isAster)
