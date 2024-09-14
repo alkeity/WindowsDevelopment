@@ -71,7 +71,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	int posY = (GetSystemMetrics(SM_CYSCREEN) - CW_USEDEFAULT) / 2;*/
 
 	HWND hwnd = CreateWindowEx(
-		NULL,
+		WS_EX_ACCEPTFILES,
 		g_sz_WINDOW_CLASS,
 		g_sz_WINDOW_CLASS,
 		WS_OVERLAPPEDWINDOW,
@@ -143,7 +143,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetStatusBar(hwnd, (CHAR*)"None");
 		SetStatusBarWindowSize(hStatus, winWidth, winHeight);
 
-		// edit control edition
+		// edit control creation
 		HWND hEdit = CreateWindowEx
 		(
 			NULL, RICHEDIT_CLASS, "",
@@ -173,8 +173,7 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				switch (MessageBox(hwnd, "Сохранить файл?", "Файл был изменен", MB_YESNOCANCEL | MB_ICONQUESTION))
 				{
-				case IDOK: SendMessage(hwnd, WM_COMMAND, ID_FILE_SAVE, 0); break;
-				case IDNO: break;
+				case IDYES: SendMessage(hwnd, WM_COMMAND, ID_FILE_SAVE, 0); break;
 				case IDCANCEL: isCancel = TRUE; break;
 				default: break;
 				}
@@ -259,7 +258,33 @@ BOOL CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
+	case WM_DROPFILES:
+	{
+		BOOLEAN isCancel = FALSE;
+		if (!isSaved)
+		{
+			switch (MessageBox(hwnd, "Сохранить файл?", "Файл был изменен", MB_YESNOCANCEL | MB_ICONQUESTION))
+			{
+			case IDYES: SendMessage(hwnd, WM_COMMAND, ID_FILE_SAVE, 0); break;
+			case IDCANCEL: isCancel = TRUE; break;
+			default: break;
+			}
+		}
+		if (isCancel) break;
 
+		HDROP hDrop = (HDROP)wParam;
+		DragQueryFile(hDrop, 0, szFileName, MAX_PATH);
+
+		LoadTextFile(hwnd, szFileName);
+		SetFileInfoToStatusBar(hwnd, szFileName);
+		SetStatusBar(hwnd, szFileName);
+		SetWindowName(hwnd, szFileName);
+		isSaved = TRUE;
+		isAster = FALSE;
+
+		DragFinish(hDrop);
+	}
+	break;
 	case WM_SIZE:
 	{
 		RECT clientRect;
