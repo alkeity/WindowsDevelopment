@@ -89,6 +89,16 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		return 0;
 	}
 
+	if (lpCmdLine && strlen(lpCmdLine) > 0)
+	{
+		CHAR szFilePath[MAX_PATH]{};
+		strncpy(szFilePath, lpCmdLine + 1, strlen(lpCmdLine) - 2);
+		LoadTextFile(hwnd, szFilePath);
+		SetFileInfoToStatusBar(hwnd, szFilePath);
+		SetStatusBar(hwnd, szFilePath);
+		SetWindowName(hwnd, szFilePath);
+	}
+
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
 
