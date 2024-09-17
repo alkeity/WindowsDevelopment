@@ -17,6 +17,20 @@ namespace Clock
 			InitializeComponent();
 		}
 
+		private void MainForm_Load(object sender, EventArgs e)
+		{
+
+		}
+
+		private void MainForm_Resize(object sender, EventArgs e)
+		{
+			if (this.WindowState == FormWindowState.Minimized)
+			{
+				//notifyIconResize.ShowBalloonTip(500);
+				this.ShowInTaskbar = false;
+			}
+		}
+
 		private void timer1_Tick(object sender, EventArgs e)
 		{
 			label1.Text = DateTime.Now.ToString("HH:mm:ss");
@@ -28,14 +42,10 @@ namespace Clock
 
 		}
 
-		private void MainForm_Load(object sender, EventArgs e)
-		{
-
-		}
-
 		private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
 		{
 			this.Show();
+			this.ShowInTaskbar = true;
 			this.WindowState = FormWindowState.Normal;
 		}
 	}
