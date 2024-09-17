@@ -32,5 +32,11 @@ namespace Clock
 		{
 
 		}
+
+		private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			this.Show();
+			this.WindowState = FormWindowState.Normal;
+		}
 	}
 }

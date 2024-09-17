@@ -33,6 +33,7 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.cbShowDate = new System.Windows.Forms.CheckBox();
+			this.notifyIconResize = new System.Windows.Forms.NotifyIcon(this.components);
 			this.SuspendLayout();
 			// 
 			// label1
@@ -63,6 +64,15 @@
 			this.cbShowDate.UseVisualStyleBackColor = true;
 			this.cbShowDate.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
 			// 
+			// notifyIconResize
+			// 
+			this.notifyIconResize.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+			this.notifyIconResize.BalloonTipText = "Clock gone to tray!";
+			this.notifyIconResize.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIconResize.Icon")));
+			this.notifyIconResize.Text = "MainForm";
+			this.notifyIconResize.Visible = true;
+			this.notifyIconResize.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -84,6 +94,7 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Timer timer1;
 		private System.Windows.Forms.CheckBox cbShowDate;
+		private System.Windows.Forms.NotifyIcon notifyIconResize;
 	}
 }
 
