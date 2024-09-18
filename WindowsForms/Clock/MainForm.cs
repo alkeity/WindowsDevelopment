@@ -86,6 +86,26 @@ namespace Clock
 			this.Close();
 		}
 
+		private void backgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ColorDialog dialog = new ColorDialog();
+			if (dialog.ShowDialog() == DialogResult.OK)
+			{
+				labelTime.BackColor = dialog.Color;
+				this.BackColor = dialog.Color;
+			}
+		}
+
+		private void foregroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ColorDialog dialog = new ColorDialog();
+			if (dialog.ShowDialog() == DialogResult.OK)
+			{
+				labelTime.ForeColor = dialog.Color;
+				this.ForeColor = dialog.Color;
+			}
+		}
+
 		private Point GetPosition()
 		{
 			int startX = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Right - this.Right - boundsX;
