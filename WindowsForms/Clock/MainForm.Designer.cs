@@ -30,21 +30,30 @@
 		{
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-			this.label1 = new System.Windows.Forms.Label();
+			this.labelTime = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.cbShowDate = new System.Windows.Forms.CheckBox();
 			this.notifyIconResize = new System.Windows.Forms.NotifyIcon(this.components);
+			this.btnShowControls = new System.Windows.Forms.Button();
+			this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+			this.contextMenuTray = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.showControlsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.showDatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.contextMenuTray.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// label1
+			// labelTime
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 32F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.label1.Location = new System.Drawing.Point(12, 9);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(144, 51);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "label1";
+			this.labelTime.AutoSize = true;
+			this.labelTime.ContextMenuStrip = this.contextMenuTray;
+			this.labelTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 32F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.labelTime.Location = new System.Drawing.Point(12, 9);
+			this.labelTime.Name = "labelTime";
+			this.labelTime.Size = new System.Drawing.Size(219, 51);
+			this.labelTime.TabIndex = 0;
+			this.labelTime.Text = "labelTime";
 			// 
 			// timer1
 			// 
@@ -68,24 +77,83 @@
 			// 
 			this.notifyIconResize.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
 			this.notifyIconResize.BalloonTipText = "Clock gone to tray!";
+			this.notifyIconResize.ContextMenuStrip = this.contextMenuTray;
 			this.notifyIconResize.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIconResize.Icon")));
 			this.notifyIconResize.Text = "MainForm";
 			this.notifyIconResize.Visible = true;
-			this.notifyIconResize.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
+			this.notifyIconResize.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIconResize_MouseDoubleClick);
+			// 
+			// btnShowControls
+			// 
+			this.btnShowControls.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.btnShowControls.Location = new System.Drawing.Point(215, 157);
+			this.btnShowControls.Name = "btnShowControls";
+			this.btnShowControls.Size = new System.Drawing.Size(126, 33);
+			this.btnShowControls.TabIndex = 2;
+			this.btnShowControls.Text = "Hide controls";
+			this.btnShowControls.UseVisualStyleBackColor = true;
+			this.btnShowControls.Click += new System.EventHandler(this.btnShowControls_Click);
+			// 
+			// notifyIcon1
+			// 
+			this.notifyIcon1.Text = "notifyIcon1";
+			this.notifyIcon1.Visible = true;
+			// 
+			// contextMenuTray
+			// 
+			this.contextMenuTray.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showControlsToolStripMenuItem,
+            this.showDatToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.closeToolStripMenuItem});
+			this.contextMenuTray.Name = "contextMenuTray";
+			this.contextMenuTray.Size = new System.Drawing.Size(150, 76);
+			// 
+			// showControlsToolStripMenuItem
+			// 
+			this.showControlsToolStripMenuItem.Checked = true;
+			this.showControlsToolStripMenuItem.CheckOnClick = true;
+			this.showControlsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.showControlsToolStripMenuItem.Name = "showControlsToolStripMenuItem";
+			this.showControlsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.showControlsToolStripMenuItem.Text = "Show controls";
+			this.showControlsToolStripMenuItem.Click += new System.EventHandler(this.showControlsToolStripMenuItem_Click);
+			// 
+			// showDatToolStripMenuItem
+			// 
+			this.showDatToolStripMenuItem.CheckOnClick = true;
+			this.showDatToolStripMenuItem.Name = "showDatToolStripMenuItem";
+			this.showDatToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.showDatToolStripMenuItem.Text = "Show date";
+			this.showDatToolStripMenuItem.Click += new System.EventHandler(this.showDatToolStripMenuItem_Click);
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+			// 
+			// closeToolStripMenuItem
+			// 
+			this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+			this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.closeToolStripMenuItem.Text = "Close";
+			this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(646, 449);
+			this.ClientSize = new System.Drawing.Size(353, 202);
+			this.Controls.Add(this.btnShowControls);
 			this.Controls.Add(this.cbShowDate);
-			this.Controls.Add(this.label1);
+			this.Controls.Add(this.labelTime);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "MainForm";
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
+			this.contextMenuTray.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -93,10 +161,17 @@
 
 		#endregion
 
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label labelTime;
 		private System.Windows.Forms.Timer timer1;
 		private System.Windows.Forms.CheckBox cbShowDate;
 		private System.Windows.Forms.NotifyIcon notifyIconResize;
+		private System.Windows.Forms.Button btnShowControls;
+		private System.Windows.Forms.NotifyIcon notifyIcon1;
+		private System.Windows.Forms.ContextMenuStrip contextMenuTray;
+		private System.Windows.Forms.ToolStripMenuItem showControlsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem showDatToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
 	}
 }
 
