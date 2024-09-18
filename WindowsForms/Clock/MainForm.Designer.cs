@@ -54,6 +54,7 @@
 			this.labelTime.Size = new System.Drawing.Size(219, 51);
 			this.labelTime.TabIndex = 0;
 			this.labelTime.Text = "labelTime";
+			this.labelTime.DoubleClick += new System.EventHandler(this.labelTime_DoubleClick);
 			// 
 			// timer1
 			// 

@@ -7,12 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Clock
 {
 	public partial class MainForm : Form
 	{
 		bool isVisible;
+		int boundsX = 25;
+		int boundsY = 75;
 		String datetimeFormat;
 
 		public MainForm()
@@ -20,6 +23,8 @@ namespace Clock
 			InitializeComponent();
 			isVisible = true;
 			datetimeFormat = "HH:mm:ss";
+			this.StartPosition = FormStartPosition.Manual;
+			this.Location = GetPosition();
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
@@ -39,6 +44,11 @@ namespace Clock
 		private void timer1_Tick(object sender, EventArgs e)
 		{
 			labelTime.Text = DateTime.Now.ToString(datetimeFormat);
+		}
+
+		private void labelTime_DoubleClick(object sender, EventArgs e)
+		{
+			SetControlsVisibility(!isVisible);
 		}
 
 		private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -74,6 +84,14 @@ namespace Clock
 		private void closeToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			this.Close();
+		}
+
+		private Point GetPosition()
+		{
+			int startX = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Right - this.Right - boundsX;
+			int startY = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Top + boundsY;
+
+			return new Point(startX, startY);
 		}
 
 		private void SetControlsVisibility(bool isVisible)
