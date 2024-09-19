@@ -29,7 +29,10 @@ namespace Clock
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-
+			this.BackColor = Properties.Settings.Default.BackgroundColor;
+			labelTime.BackColor = Properties.Settings.Default.BackgroundColor;
+			this.ForeColor = Properties.Settings.Default.ForegroundColor;
+			labelTime.ForeColor = Properties.Settings.Default.ForegroundColor;
 		}
 
 		private void MainForm_Resize(object sender, EventArgs e)
@@ -93,6 +96,8 @@ namespace Clock
 			{
 				labelTime.BackColor = dialog.Color;
 				this.BackColor = dialog.Color;
+				Properties.Settings.Default.BackgroundColor = dialog.Color;
+				Properties.Settings.Default.Save();
 			}
 		}
 
@@ -103,6 +108,8 @@ namespace Clock
 			{
 				labelTime.ForeColor = dialog.Color;
 				this.ForeColor = dialog.Color;
+				Properties.Settings.Default.ForegroundColor = dialog.Color;
+				Properties.Settings.Default.Save();
 			}
 		}
 
