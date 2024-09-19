@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,29 @@ namespace Clock
 		int boundsY = 75;
 		String datetimeFormat;
 
+		private Point GetPosition()
+		{
+			int startX = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Right - this.Right - boundsX;
+			int startY = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Top + boundsY;
+
+			return new Point(startX, startY);
+		}
+
+		private void SetControlsVisibility(bool isVisible)
+		{
+			this.isVisible = isVisible;
+			showControlsToolStripMenuItem.Checked = isVisible;
+
+			this.cbShowDate.Visible = isVisible;
+			this.btnShowControls.Visible = isVisible;
+			this.TopMost = !isVisible;
+			this.ShowInTaskbar = isVisible;
+
+			this.TransparencyKey = isVisible ? Color.Empty : this.BackColor;
+			this.FormBorderStyle = isVisible ? FormBorderStyle.Sizable : FormBorderStyle.None;
+			labelTime.BackColor = isVisible ? this.BackColor : Color.LightGray;
+		}
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -25,23 +49,23 @@ namespace Clock
 			datetimeFormat = "HH:mm:ss";
 			this.StartPosition = FormStartPosition.Manual;
 			this.Location = GetPosition();
+			this.BackColor = Properties.Settings.Default.BackgroundColor;
+			this.ForeColor = Properties.Settings.Default.ForegroundColor;
+
+			labelTime.BackColor = Properties.Settings.Default.BackgroundColor;
+			labelTime.ForeColor = Properties.Settings.Default.ForegroundColor;
+			labelTime.Font = Properties.Settings.Default.ClockFont;
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			this.BackColor = Properties.Settings.Default.BackgroundColor;
-			labelTime.BackColor = Properties.Settings.Default.BackgroundColor;
-			this.ForeColor = Properties.Settings.Default.ForegroundColor;
-			labelTime.ForeColor = Properties.Settings.Default.ForegroundColor;
+			//
 		}
 
 		private void MainForm_Resize(object sender, EventArgs e)
 		{
-			if (this.WindowState == FormWindowState.Minimized)
-			{
-				//notifyIconResize.ShowBalloonTip(500);
-				this.ShowInTaskbar = false;
-			}
+			if (this.WindowState == FormWindowState.Minimized) this.ShowInTaskbar = false;
+			else if (isVisible) SetControlsVisibility(true);
 		}
 
 		private void timer1_Tick(object sender, EventArgs e)
@@ -113,27 +137,15 @@ namespace Clock
 			}
 		}
 
-		private Point GetPosition()
+		private void fontToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			int startX = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Right - this.Right - boundsX;
-			int startY = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Top + boundsY;
-
-			return new Point(startX, startY);
-		}
-
-		private void SetControlsVisibility(bool isVisible)
-		{
-			this.isVisible = isVisible;
-			showControlsToolStripMenuItem.Checked = isVisible;
-
-			this.cbShowDate.Visible = isVisible;
-			this.btnShowControls.Visible = isVisible;
-			this.TopMost = !isVisible;
-			this.ShowInTaskbar = isVisible;
-
-			this.TransparencyKey = isVisible ? Color.Empty : this.BackColor;
-			this.FormBorderStyle = isVisible ? FormBorderStyle.Sizable : FormBorderStyle.None;
-			labelTime.BackColor = isVisible ? this.BackColor : Color.LightGray;
+			FontDialog dialog = new FontDialog();
+			if (dialog.ShowDialog() == DialogResult.OK)
+			{
+				labelTime.Font = dialog.Font;
+				Properties.Settings.Default.ClockFont = dialog.Font;
+				Properties.Settings.Default.Save();
+			}
 		}
 	}
 }

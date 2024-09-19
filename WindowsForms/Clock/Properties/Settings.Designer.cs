@@ -46,5 +46,17 @@ namespace Clock.Properties {
                 this["ForegroundColor"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Microsoft Sans Serif, 32.25pt")]
+        public global::System.Drawing.Font ClockFont {
+            get {
+                return ((global::System.Drawing.Font)(this["ClockFont"]));
+            }
+            set {
+                this["ClockFont"] = value;
+            }
+        }
     }
 }
