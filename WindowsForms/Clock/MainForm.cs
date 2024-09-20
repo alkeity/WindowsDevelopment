@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,6 +19,7 @@ namespace Clock
 		int boundsX = 25;
 		int boundsY = 75;
 		String datetimeFormat;
+		PrivateFontCollection fontCollection;
 
 		private Point GetPosition()
 		{
@@ -42,9 +44,21 @@ namespace Clock
 			labelTime.BackColor = isVisible ? this.BackColor : Color.LightGray;
 		}
 
+		private void SetCustomFont()
+		{
+			labelTime.Font = new Font(fontCollection.Families[0], 50, FontStyle.Regular);
+			Properties.Settings.Default.isCustomFont = true;
+			Properties.Settings.Default.Save();
+		}
+
 		public MainForm()
 		{
+			AllocConsole();
 			InitializeComponent();
+
+			fontCollection = new PrivateFontCollection();
+			fontCollection.AddFontFile("..\\..\\Resources\\digital-7.ttf");
+
 			isVisible = true;
 			datetimeFormat = "HH:mm:ss";
 			this.StartPosition = FormStartPosition.Manual;
@@ -54,12 +68,14 @@ namespace Clock
 
 			labelTime.BackColor = Properties.Settings.Default.BackgroundColor;
 			labelTime.ForeColor = Properties.Settings.Default.ForegroundColor;
-			labelTime.Font = Properties.Settings.Default.ClockFont;
+			if (Properties.Settings.Default.isCustomFont) SetCustomFont();
+			else labelTime.Font = Properties.Settings.Default.ClockFont;
 		}
 
-		private void MainForm_Load(object sender, EventArgs e)
+		~MainForm()
 		{
-			//
+			fontCollection.Dispose();
+			FreeConsole();
 		}
 
 		private void MainForm_Resize(object sender, EventArgs e)
@@ -137,15 +153,26 @@ namespace Clock
 			}
 		}
 
-		private void fontToolStripMenuItem_Click(object sender, EventArgs e)
+		private void digital7ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SetCustomFont();
+		}
+
+		private void systemFontsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			FontDialog dialog = new FontDialog();
 			if (dialog.ShowDialog() == DialogResult.OK)
 			{
 				labelTime.Font = dialog.Font;
 				Properties.Settings.Default.ClockFont = dialog.Font;
+				Properties.Settings.Default.isCustomFont = false;
 				Properties.Settings.Default.Save();
 			}
 		}
+
+		[DllImport("kernel32.dll")]
+		private static extern bool AllocConsole();
+		[DllImport("kernel32.dll")]
+		private static extern bool FreeConsole();
 	}
 }

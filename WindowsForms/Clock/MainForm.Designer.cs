@@ -35,6 +35,9 @@
 			this.showControlsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.showDatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			this.fontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.digital7ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.systemFontsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.colorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.backgroundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.foregroundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,7 +47,6 @@
 			this.cbShowDate = new System.Windows.Forms.CheckBox();
 			this.notifyIconResize = new System.Windows.Forms.NotifyIcon(this.components);
 			this.btnShowControls = new System.Windows.Forms.Button();
-			this.fontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuTray.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -96,6 +98,29 @@
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
 			this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+			// 
+			// fontToolStripMenuItem
+			// 
+			this.fontToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.digital7ToolStripMenuItem,
+            this.systemFontsToolStripMenuItem});
+			this.fontToolStripMenuItem.Name = "fontToolStripMenuItem";
+			this.fontToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.fontToolStripMenuItem.Text = "Font";
+			// 
+			// digital7ToolStripMenuItem
+			// 
+			this.digital7ToolStripMenuItem.Name = "digital7ToolStripMenuItem";
+			this.digital7ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.digital7ToolStripMenuItem.Text = "digital-7";
+			this.digital7ToolStripMenuItem.Click += new System.EventHandler(this.digital7ToolStripMenuItem_Click);
+			// 
+			// systemFontsToolStripMenuItem
+			// 
+			this.systemFontsToolStripMenuItem.Name = "systemFontsToolStripMenuItem";
+			this.systemFontsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.systemFontsToolStripMenuItem.Text = "System Fonts";
+			this.systemFontsToolStripMenuItem.Click += new System.EventHandler(this.systemFontsToolStripMenuItem_Click);
 			// 
 			// colorsToolStripMenuItem
 			// 
@@ -171,13 +196,6 @@
 			this.btnShowControls.UseVisualStyleBackColor = true;
 			this.btnShowControls.Click += new System.EventHandler(this.btnShowControls_Click);
 			// 
-			// fontToolStripMenuItem
-			// 
-			this.fontToolStripMenuItem.Name = "fontToolStripMenuItem";
-			this.fontToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.fontToolStripMenuItem.Text = "Font";
-			this.fontToolStripMenuItem.Click += new System.EventHandler(this.fontToolStripMenuItem_Click);
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -190,7 +208,6 @@
 			this.MaximizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "MainForm";
-			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.Resize += new System.EventHandler(this.MainForm_Resize);
 			this.contextMenuTray.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -215,6 +232,8 @@
 		private System.Windows.Forms.ToolStripMenuItem foregroundColorToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripMenuItem fontToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem digital7ToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem systemFontsToolStripMenuItem;
 	}
 }
 
