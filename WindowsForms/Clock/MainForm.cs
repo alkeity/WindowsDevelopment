@@ -35,8 +35,9 @@ namespace Clock
 			showControlsToolStripMenuItem.Checked = isVisible;
 
 			this.cbShowDate.Visible = isVisible;
+			this.cbPin.Visible = isVisible;
 			this.btnShowControls.Visible = isVisible;
-			this.TopMost = !isVisible;
+			this.TopMost = isVisible && !cbPin.Checked ? false : true;
 			this.ShowInTaskbar = isVisible;
 
 			this.TransparencyKey = isVisible ? Color.Empty : this.BackColor;
@@ -99,6 +100,11 @@ namespace Clock
 			showDatToolStripMenuItem.Checked = cbShowDate.Checked;
 			if (cbShowDate.Checked) datetimeFormat = "HH:mm:ss\ndd.MM.yyyy";
 			else datetimeFormat = "HH:mm:ss";
+		}
+
+		private void cbPin_CheckedChanged(object sender, EventArgs e)
+		{
+			this.TopMost = !this.TopMost;
 		}
 
 		private void notifyIconResize_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -168,6 +174,11 @@ namespace Clock
 				Properties.Settings.Default.isCustomFont = false;
 				Properties.Settings.Default.Save();
 			}
+		}
+
+		private void iconToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+
 		}
 
 		[DllImport("kernel32.dll")]
