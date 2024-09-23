@@ -49,6 +49,7 @@
 			this.notifyIconResize = new System.Windows.Forms.NotifyIcon(this.components);
 			this.btnShowControls = new System.Windows.Forms.Button();
 			this.cbPin = new System.Windows.Forms.CheckBox();
+			this.cbPinBtn = new System.Windows.Forms.CheckBox();
 			this.contextMenuTray.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -62,7 +63,6 @@
 			this.labelTime.Size = new System.Drawing.Size(219, 51);
 			this.labelTime.TabIndex = 0;
 			this.labelTime.Text = "labelTime";
-			this.labelTime.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			this.labelTime.DoubleClick += new System.EventHandler(this.labelTime_DoubleClick);
 			// 
 			// contextMenuTray
@@ -77,7 +77,7 @@
             this.toolStripSeparator1,
             this.closeToolStripMenuItem});
 			this.contextMenuTray.Name = "contextMenuTray";
-			this.contextMenuTray.Size = new System.Drawing.Size(150, 148);
+			this.contextMenuTray.Size = new System.Drawing.Size(181, 170);
 			// 
 			// showControlsToolStripMenuItem
 			// 
@@ -85,7 +85,7 @@
 			this.showControlsToolStripMenuItem.CheckOnClick = true;
 			this.showControlsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.showControlsToolStripMenuItem.Name = "showControlsToolStripMenuItem";
-			this.showControlsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.showControlsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.showControlsToolStripMenuItem.Text = "Show controls";
 			this.showControlsToolStripMenuItem.Click += new System.EventHandler(this.showControlsToolStripMenuItem_Click);
 			// 
@@ -93,14 +93,14 @@
 			// 
 			this.showDatToolStripMenuItem.CheckOnClick = true;
 			this.showDatToolStripMenuItem.Name = "showDatToolStripMenuItem";
-			this.showDatToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.showDatToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.showDatToolStripMenuItem.Text = "Show date";
 			this.showDatToolStripMenuItem.Click += new System.EventHandler(this.showDatToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(146, 6);
+			this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
 			// 
 			// fontToolStripMenuItem
 			// 
@@ -108,7 +108,7 @@
             this.digital7ToolStripMenuItem,
             this.systemFontsToolStripMenuItem});
 			this.fontToolStripMenuItem.Name = "fontToolStripMenuItem";
-			this.fontToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.fontToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.fontToolStripMenuItem.Text = "Font";
 			// 
 			// digital7ToolStripMenuItem
@@ -131,39 +131,39 @@
             this.backgroundColorToolStripMenuItem,
             this.foregroundColorToolStripMenuItem});
 			this.colorsToolStripMenuItem.Name = "colorsToolStripMenuItem";
-			this.colorsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.colorsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.colorsToolStripMenuItem.Text = "Colors";
 			// 
 			// backgroundColorToolStripMenuItem
 			// 
 			this.backgroundColorToolStripMenuItem.Name = "backgroundColorToolStripMenuItem";
-			this.backgroundColorToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+			this.backgroundColorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.backgroundColorToolStripMenuItem.Text = "Background color";
 			this.backgroundColorToolStripMenuItem.Click += new System.EventHandler(this.backgroundColorToolStripMenuItem_Click);
 			// 
 			// foregroundColorToolStripMenuItem
 			// 
 			this.foregroundColorToolStripMenuItem.Name = "foregroundColorToolStripMenuItem";
-			this.foregroundColorToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+			this.foregroundColorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.foregroundColorToolStripMenuItem.Text = "Foreground color";
 			this.foregroundColorToolStripMenuItem.Click += new System.EventHandler(this.foregroundColorToolStripMenuItem_Click);
 			// 
 			// iconToolStripMenuItem
 			// 
 			this.iconToolStripMenuItem.Name = "iconToolStripMenuItem";
-			this.iconToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.iconToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.iconToolStripMenuItem.Text = "Icon";
 			this.iconToolStripMenuItem.Click += new System.EventHandler(this.iconToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(146, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
 			// 
 			// closeToolStripMenuItem
 			// 
 			this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-			this.closeToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+			this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.closeToolStripMenuItem.Text = "Close";
 			this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
 			// 
@@ -218,11 +218,26 @@
 			this.cbPin.UseVisualStyleBackColor = true;
 			this.cbPin.CheckedChanged += new System.EventHandler(this.cbPin_CheckedChanged);
 			// 
+			// cbPinBtn
+			// 
+			this.cbPinBtn.Appearance = System.Windows.Forms.Appearance.Button;
+			this.cbPinBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("cbPinBtn.BackgroundImage")));
+			this.cbPinBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+			this.cbPinBtn.FlatAppearance.BorderSize = 0;
+			this.cbPinBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.cbPinBtn.Location = new System.Drawing.Point(313, 9);
+			this.cbPinBtn.Name = "cbPinBtn";
+			this.cbPinBtn.Size = new System.Drawing.Size(25, 25);
+			this.cbPinBtn.TabIndex = 4;
+			this.cbPinBtn.UseVisualStyleBackColor = true;
+			this.cbPinBtn.CheckedChanged += new System.EventHandler(this.cbPinBtn_CheckedChanged);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(353, 202);
+			this.Controls.Add(this.cbPinBtn);
 			this.Controls.Add(this.cbPin);
 			this.Controls.Add(this.btnShowControls);
 			this.Controls.Add(this.cbShowDate);
@@ -259,6 +274,7 @@
 		private System.Windows.Forms.ToolStripMenuItem systemFontsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem iconToolStripMenuItem;
 		private System.Windows.Forms.CheckBox cbPin;
+		private System.Windows.Forms.CheckBox cbPinBtn;
 	}
 }
 

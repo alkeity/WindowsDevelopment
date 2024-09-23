@@ -36,6 +36,7 @@ namespace Clock
 
 			this.cbShowDate.Visible = isVisible;
 			this.cbPin.Visible = isVisible;
+			this.cbPinBtn.Visible = isVisible;
 			this.btnShowControls.Visible = isVisible;
 			this.TopMost = isVisible && !cbPin.Checked ? false : true;
 			this.ShowInTaskbar = isVisible;
@@ -102,9 +103,18 @@ namespace Clock
 			else datetimeFormat = "HH:mm:ss";
 		}
 
+		private void cbPinBtn_CheckedChanged(object sender, EventArgs e)
+		{
+			this.TopMost = cbPinBtn.Checked;
+			cbPin.Checked = cbPinBtn.Checked;
+			cbPinBtn.BackgroundImage = cbPinBtn.Checked ? Properties.Resources.pin_fill.ToBitmap()
+				: Properties.Resources.pin_outline.ToBitmap();
+		}
+
 		private void cbPin_CheckedChanged(object sender, EventArgs e)
 		{
-			this.TopMost = !this.TopMost;
+			this.TopMost = cbPin.Checked;
+			cbPinBtn.Checked = cbPin.Checked;
 		}
 
 		private void notifyIconResize_MouseDoubleClick(object sender, MouseEventArgs e)
