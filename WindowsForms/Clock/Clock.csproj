@@ -49,6 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IconDialogue.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IconDialogue.Designer.cs">
+      <DependentUpon>IconDialogue.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -57,6 +63,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="IconDialogue.resx">
+      <DependentUpon>IconDialogue.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -85,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="g12-clock_97294.ico" />
+    <None Include="Resources\time_clock_icon_145885.ico" />
     <None Include="Resources\pin_outline.ico" />
     <None Include="Resources\pin_fill.ico" />
   </ItemGroup>

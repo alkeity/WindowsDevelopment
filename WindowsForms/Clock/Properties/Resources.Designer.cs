@@ -63,6 +63,26 @@ namespace Clock.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon icon_blue_clock {
+            get {
+                object obj = ResourceManager.GetObject("icon_blue_clock", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon icon_default {
+            get {
+                object obj = ResourceManager.GetObject("icon_default", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon pin_fill {
             get {
                 object obj = ResourceManager.GetObject("pin_fill", resourceCulture);

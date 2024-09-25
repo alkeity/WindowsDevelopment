@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define CONSOLE
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Clock
 {
@@ -53,9 +56,26 @@ namespace Clock
 			Properties.Settings.Default.Save();
 		}
 
+		private void SetIcon()
+		{
+			switch (Properties.Settings.Default.IconIndex)
+			{
+				case 0:
+					this.Icon = Properties.Resources.icon_default;
+					notifyIconResize.Icon = Properties.Resources.icon_default;
+					break;
+				case 1:
+					this.Icon = Properties.Resources.icon_blue_clock;
+					notifyIconResize.Icon = Properties.Resources.icon_blue_clock;
+					break;
+			}
+		}
+
 		public MainForm()
 		{
+#if CONSOLE
 			AllocConsole();
+#endif
 			InitializeComponent();
 
 			fontCollection = new PrivateFontCollection();
@@ -67,6 +87,7 @@ namespace Clock
 			this.Location = GetPosition();
 			this.BackColor = Properties.Settings.Default.BackgroundColor;
 			this.ForeColor = Properties.Settings.Default.ForegroundColor;
+			SetIcon();
 
 			labelTime.BackColor = Properties.Settings.Default.BackgroundColor;
 			labelTime.ForeColor = Properties.Settings.Default.ForegroundColor;
@@ -77,7 +98,9 @@ namespace Clock
 		~MainForm()
 		{
 			fontCollection.Dispose();
+#if CONSOLE
 			FreeConsole();
+#endif
 		}
 
 		private void MainForm_Resize(object sender, EventArgs e)
@@ -188,7 +211,14 @@ namespace Clock
 
 		private void iconToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-
+			// TODO this needs to be applied to all icons and be saved in user settings
+			IconDialogue dialog = new IconDialogue();
+			if (dialog.ShowDialog() == DialogResult.OK)
+			{
+				Properties.Settings.Default.IconIndex = dialog.ItemIndex;
+				Properties.Settings.Default.Save();
+				SetIcon();
+			}
 		}
 
 		[DllImport("kernel32.dll")]

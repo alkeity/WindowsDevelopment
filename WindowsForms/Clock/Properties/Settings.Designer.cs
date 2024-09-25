@@ -70,5 +70,17 @@ namespace Clock.Properties {
                 this["isCustomFont"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int IconIndex {
+            get {
+                return ((int)(this["IconIndex"]));
+            }
+            set {
+                this["IconIndex"] = value;
+            }
+        }
     }
 }
