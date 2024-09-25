@@ -211,7 +211,6 @@ namespace Clock
 
 		private void iconToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			// TODO this needs to be applied to all icons and be saved in user settings
 			IconDialogue dialog = new IconDialogue();
 			if (dialog.ShowDialog() == DialogResult.OK)
 			{

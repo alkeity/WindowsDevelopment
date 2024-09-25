@@ -18,9 +18,23 @@ namespace Clock
 		{
 			get => itemIndex;
 		}
+
+		private void SetIcon()
+		{
+			switch (Properties.Settings.Default.IconIndex)
+			{
+				case 0:
+					this.Icon = Properties.Resources.icon_default;
+					break;
+				case 1:
+					this.Icon = Properties.Resources.icon_blue_clock;
+					break;
+			}
+		}
 		public IconDialogue()
 		{
 			InitializeComponent();
+			SetIcon();
 			itemIndex = 0;
 		}
 
