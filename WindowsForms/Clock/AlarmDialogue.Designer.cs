@@ -32,6 +32,7 @@
 			this.dtAlarmPicker = new System.Windows.Forms.DateTimePicker();
 			this.btnOK = new System.Windows.Forms.Button();
 			this.btnCancel = new System.Windows.Forms.Button();
+			this.btnChooseSound = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// dtAlarmPicker
@@ -48,7 +49,7 @@
 			// btnOK
 			// 
 			this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.btnOK.Location = new System.Drawing.Point(93, 72);
+			this.btnOK.Location = new System.Drawing.Point(175, 78);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
 			this.btnOK.TabIndex = 1;
@@ -59,7 +60,7 @@
 			// btnCancel
 			// 
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(174, 72);
+			this.btnCancel.Location = new System.Drawing.Point(256, 78);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 2;
@@ -67,12 +68,23 @@
 			this.btnCancel.UseVisualStyleBackColor = true;
 			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 			// 
+			// btnChooseSound
+			// 
+			this.btnChooseSound.Location = new System.Drawing.Point(12, 80);
+			this.btnChooseSound.Name = "btnChooseSound";
+			this.btnChooseSound.Size = new System.Drawing.Size(75, 23);
+			this.btnChooseSound.TabIndex = 3;
+			this.btnChooseSound.Text = "Alarm sound";
+			this.btnChooseSound.UseVisualStyleBackColor = true;
+			this.btnChooseSound.Click += new System.EventHandler(this.btnChooseSound_Click);
+			// 
 			// AlarmDialogue
 			// 
 			this.AcceptButton = this.btnOK;
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.CancelButton = this.btnCancel;
 			this.ClientSize = new System.Drawing.Size(344, 113);
+			this.Controls.Add(this.btnChooseSound);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnOK);
 			this.Controls.Add(this.dtAlarmPicker);
@@ -93,5 +105,6 @@
 		private System.Windows.Forms.DateTimePicker dtAlarmPicker;
 		private System.Windows.Forms.Button btnOK;
 		private System.Windows.Forms.Button btnCancel;
+		private System.Windows.Forms.Button btnChooseSound;
 	}
 }

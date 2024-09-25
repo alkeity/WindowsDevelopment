@@ -13,15 +13,17 @@ namespace Clock
 	public partial class AlarmDialogue : Form
 	{
 		DateTime alarmTime;
+		string soundPath;
 
-		public DateTime AlarmTime
-		{
-			get => alarmTime;
-		}
+		public DateTime AlarmTime { get => alarmTime; }
+
+		public string SoundPath { get => soundPath; }
+
 		public AlarmDialogue()
 		{
 			InitializeComponent();
 			alarmTime = DateTime.Now;
+			soundPath = string.Empty;
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)
@@ -33,6 +35,12 @@ namespace Clock
 		private void btnCancel_Click(object sender, EventArgs e)
 		{
 			this.DialogResult=DialogResult.Cancel;
+		}
+
+		private void btnChooseSound_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog ofd = new OpenFileDialog();
+			if (ofd.ShowDialog() == DialogResult.OK) soundPath = ofd.FileName;
 		}
 	}
 }

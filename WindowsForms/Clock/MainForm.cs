@@ -1,4 +1,4 @@
-﻿#define CONSOLE
+﻿//#define CONSOLE
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ namespace Clock
 		int boundsX = 25;
 		int boundsY = 75;
 		String datetimeFormat;
+		String soundPath;
 		DateTime alarmTime;
 		PrivateFontCollection fontCollection;
 
@@ -116,7 +117,13 @@ namespace Clock
 			labelTime.Text = DateTime.Now.ToString(datetimeFormat);
 			if (alarmTime.Equals(timeNow))
 			{
-				MessageBox.Show("Get up sis time to fight");
+				if (soundPath != string.Empty)
+				{
+					axPlayer.URL = soundPath;
+					axPlayer.Ctlcontrols.play();
+				}
+				MessageBox.Show("Get uppppp");
+				notifyIconResize.Text = "Clock";
 			}
 		}
 
@@ -229,7 +236,12 @@ namespace Clock
 		private void alarmToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			AlarmDialogue alarmForm = new AlarmDialogue();
-			if (alarmForm.ShowDialog() == DialogResult.OK) alarmTime = alarmForm.AlarmTime;
+			if (alarmForm.ShowDialog() == DialogResult.OK)
+			{
+				alarmTime = alarmForm.AlarmTime;
+				soundPath = alarmForm.SoundPath;
+				notifyIconResize.Text = $"Alarm time: {alarmTime}";
+			}
 		}
 
 		[DllImport("kernel32.dll")]
