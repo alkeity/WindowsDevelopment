@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Clock
 {
-	public partial class IconDialogue : Form
+	public partial class IconDialogue : Form // girl you're BLIND TODO try to use CommonDialogue
 	{
 		int itemIndex;
 

@@ -49,6 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlarmDialogue.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AlarmDialogue.Designer.cs">
+      <DependentUpon>AlarmDialogue.cs</DependentUpon>
+    </Compile>
     <Compile Include="IconDialogue.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -63,6 +69,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AlarmDialogue.resx">
+      <DependentUpon>AlarmDialogue.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="IconDialogue.resx">
       <DependentUpon>IconDialogue.cs</DependentUpon>
     </EmbeddedResource>

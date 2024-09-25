@@ -1,4 +1,4 @@
-﻿//#define CONSOLE
+﻿#define CONSOLE
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ namespace Clock
 		int boundsX = 25;
 		int boundsY = 75;
 		String datetimeFormat;
+		DateTime alarmTime;
 		PrivateFontCollection fontCollection;
 
 		private Point GetPosition()
@@ -111,7 +112,12 @@ namespace Clock
 
 		private void timer1_Tick(object sender, EventArgs e)
 		{
+			DateTime timeNow = new DateTime(DateTime.Now.Ticks - DateTime.Now.Ticks % TimeSpan.TicksPerSecond);
 			labelTime.Text = DateTime.Now.ToString(datetimeFormat);
+			if (alarmTime.Equals(timeNow))
+			{
+				MessageBox.Show("Get up sis time to fight");
+			}
 		}
 
 		private void labelTime_DoubleClick(object sender, EventArgs e)
@@ -218,6 +224,12 @@ namespace Clock
 				Properties.Settings.Default.Save();
 				SetIcon();
 			}
+		}
+
+		private void alarmToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			AlarmDialogue alarmForm = new AlarmDialogue();
+			if (alarmForm.ShowDialog() == DialogResult.OK) alarmTime = alarmForm.AlarmTime;
 		}
 
 		[DllImport("kernel32.dll")]
