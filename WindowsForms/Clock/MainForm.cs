@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using Microsoft.Win32;
 
 namespace Clock
 {
@@ -73,6 +74,14 @@ namespace Clock
 			}
 		}
 
+		private void AddToStartup(string appName)
+		{
+			RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+			Console.WriteLine(rk.GetValue(appName));
+			if (rk.GetValue(appName) == null) rk.SetValue(appName, Application.ExecutablePath.ToString());
+			else rk.DeleteValue(appName);
+		}
+
 		public MainForm()
 		{
 #if CONSOLE
@@ -82,9 +91,12 @@ namespace Clock
 
 			fontCollection = new PrivateFontCollection();
 			fontCollection.AddFontFile("..\\..\\Resources\\digital-7.ttf");
+			// TODO like 93 fails with fnf if app added to registry
+			// also !!app won't work if started from .exe file in Debug and i got no idea why
 
 			isVisible = true;
 			datetimeFormat = "HH:mm:ss";
+			startOnStartupToolStripMenuItem.Checked = Properties.Settings.Default.StartOnStartup;
 			this.StartPosition = FormStartPosition.Manual;
 			this.Location = GetPosition();
 			this.BackColor = Properties.Settings.Default.BackgroundColor;
@@ -248,5 +260,13 @@ namespace Clock
 		private static extern bool AllocConsole();
 		[DllImport("kernel32.dll")]
 		private static extern bool FreeConsole();
+
+		private void startOnStartupToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			AddToStartup("Clock.exe");
+			startOnStartupToolStripMenuItem.Checked = !startOnStartupToolStripMenuItem.Checked;
+			Properties.Settings.Default.StartOnStartup = startOnStartupToolStripMenuItem.Checked;
+			Properties.Settings.Default.Save();
+		}
 	}
 }
