@@ -82,17 +82,5 @@ namespace Clock.Properties {
                 this["IconIndex"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool StartOnStartup {
-            get {
-                return ((bool)(this["StartOnStartup"]));
-            }
-            set {
-                this["StartOnStartup"] = value;
-            }
-        }
     }
 }

@@ -74,12 +74,32 @@ namespace Clock
 			}
 		}
 
-		private void AddToStartup(string appName)
+		private bool AddToStartup(string appName)
 		{
-			RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-			Console.WriteLine(rk.GetValue(appName));
-			if (rk.GetValue(appName) == null) rk.SetValue(appName, Application.ExecutablePath.ToString());
-			else rk.DeleteValue(appName);
+			using (RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+			{
+				object rkValue = rk.GetValue(appName);
+				if (rkValue == null)
+				{
+					rk.SetValue(appName, Application.ExecutablePath.ToString());
+					return true;
+				}
+				else
+				{
+					rk.DeleteValue(appName);
+					return false;
+				}
+			}
+		}
+
+		private bool isStartup(string appName)
+		{
+			using (RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+			{
+				object rkValue = rk.GetValue(appName);
+				if (rkValue == null) return false;
+				else return true;
+			}
 		}
 
 		public MainForm()
@@ -92,11 +112,10 @@ namespace Clock
 			fontCollection = new PrivateFontCollection();
 			fontCollection.AddFontFile("..\\..\\Resources\\digital-7.ttf");
 			// TODO like 93 fails with fnf if app added to registry
-			// also !!app won't work if started from .exe file in Debug and i got no idea why
 
 			isVisible = true;
 			datetimeFormat = "HH:mm:ss";
-			startOnStartupToolStripMenuItem.Checked = Properties.Settings.Default.StartOnStartup;
+			startOnStartupToolStripMenuItem.Checked = isStartup(Application.ProductName);
 			this.StartPosition = FormStartPosition.Manual;
 			this.Location = GetPosition();
 			this.BackColor = Properties.Settings.Default.BackgroundColor;
@@ -256,17 +275,14 @@ namespace Clock
 			}
 		}
 
+		private void startOnStartupToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			startOnStartupToolStripMenuItem.Checked = AddToStartup(Application.ProductName); ;
+		}
+
 		[DllImport("kernel32.dll")]
 		private static extern bool AllocConsole();
 		[DllImport("kernel32.dll")]
 		private static extern bool FreeConsole();
-
-		private void startOnStartupToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			AddToStartup("Clock.exe");
-			startOnStartupToolStripMenuItem.Checked = !startOnStartupToolStripMenuItem.Checked;
-			Properties.Settings.Default.StartOnStartup = startOnStartupToolStripMenuItem.Checked;
-			Properties.Settings.Default.Save();
-		}
 	}
 }
