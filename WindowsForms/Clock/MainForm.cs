@@ -43,6 +43,7 @@ namespace Clock
 			this.cbShowDate.Visible = isVisible;
 			this.cbPinBtn.Visible = isVisible;
 			this.btnShowControls.Visible = isVisible;
+			this.btnAlarms.Visible = isVisible;
 			this.TopMost = isVisible && !cbPinBtn.Checked ? false : true;
 			this.ShowInTaskbar = isVisible;
 
@@ -101,10 +102,22 @@ namespace Clock
 			}
 		}
 
-		private void AddAlarmToList(Alarm alarm)
+		private void ChangeTrayName()
+		{
+			notifyIconResize.Text = alarmList.Count > 0 ? $"Next alarm time: {alarmList[0].AlarmTime}" : Application.ProductName;
+		}
+
+		public void AddAlarmToList(Alarm alarm)
 		{
 			alarmList.Add(alarm);
 			alarmList.Sort();
+			ChangeTrayName();
+		}
+
+		public void RemoveAlarmFromList(int alarmID)
+		{
+			alarmList.RemoveAt(alarmID);
+			ChangeTrayName();
 		}
 
 		private void ExecuteAlarm()
@@ -114,9 +127,16 @@ namespace Clock
 				axPlayer.URL = alarmList[0].SoundPath;
 				axPlayer.Ctlcontrols.play();
 			}
-			MessageBox.Show("Get uppppp");
+			MessageBox.Show
+				(
+				"Get uppppp", "Alarm", 
+				MessageBoxButtons.OK, MessageBoxIcon.Exclamation,
+				MessageBoxDefaultButton.Button1,
+				(MessageBoxOptions)0x40000
+				);
+			// last option is for the mb to show up topmost
 			alarmList.RemoveAt(0);
-			notifyIconResize.Text = alarmList.Count > 0 ? $"Next alarm time: {alarmList[0].AlarmTime}" : Application.ProductName;
+			ChangeTrayName();
 		}
 
 		public MainForm()
@@ -153,6 +173,8 @@ namespace Clock
 			FreeConsole();
 #endif
 		}
+
+		public List<Alarm> AlarmList { get => alarmList; }
 
 		private void MainForm_Resize(object sender, EventArgs e)
 		{
@@ -269,11 +291,13 @@ namespace Clock
 		private void alarmToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			AlarmDialogue alarmForm = new AlarmDialogue();
-			if (alarmForm.ShowDialog() == DialogResult.OK)
-			{
-				AddAlarmToList(alarmForm.Alarm);
-				notifyIconResize.Text = $"Next alarm time: {alarmList[0].AlarmTime}";
-			}
+			if (alarmForm.ShowDialog() == DialogResult.OK) AddAlarmToList(alarmForm.Alarm);
+		}
+
+		private void btnAlarms_Click(object sender, EventArgs e)
+		{
+			AlarmListForm alarmListForm = new AlarmListForm(this);
+			alarmListForm.ShowDialog();
 		}
 
 		private void startOnStartupToolStripMenuItem_Click(object sender, EventArgs e)

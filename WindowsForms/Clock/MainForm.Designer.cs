@@ -267,6 +267,7 @@
 			this.btnAlarms.TabIndex = 6;
 			this.btnAlarms.Text = "Alarms";
 			this.btnAlarms.UseVisualStyleBackColor = true;
+			this.btnAlarms.Click += new System.EventHandler(this.btnAlarms_Click);
 			// 
 			// MainForm
 			// 

@@ -94,6 +94,7 @@
 			this.MinimizeBox = false;
 			this.Name = "AlarmDialogue";
 			this.ShowInTaskbar = false;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "AlarmForm";
 			this.TopMost = true;
 			this.ResumeLayout(false);
