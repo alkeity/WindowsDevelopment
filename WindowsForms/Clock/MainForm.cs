@@ -22,10 +22,10 @@ namespace Clock
 		bool isVisible;
 		int boundsX = 25;
 		int boundsY = 75;
-		String datetimeFormat;
-		String soundPath;
-		DateTime alarmTime;
 		PrivateFontCollection fontCollection;
+		String datetimeFormat;
+
+		List<Alarm> alarmList;
 
 		private Point GetPosition()
 		{
@@ -41,10 +41,9 @@ namespace Clock
 			showControlsToolStripMenuItem.Checked = isVisible;
 
 			this.cbShowDate.Visible = isVisible;
-			this.cbPin.Visible = isVisible;
 			this.cbPinBtn.Visible = isVisible;
 			this.btnShowControls.Visible = isVisible;
-			this.TopMost = isVisible && !cbPin.Checked ? false : true;
+			this.TopMost = isVisible && !cbPinBtn.Checked ? false : true;
 			this.ShowInTaskbar = isVisible;
 
 			this.TransparencyKey = isVisible ? Color.Empty : this.BackColor;
@@ -102,6 +101,24 @@ namespace Clock
 			}
 		}
 
+		private void AddAlarmToList(Alarm alarm)
+		{
+			alarmList.Add(alarm);
+			alarmList.Sort();
+		}
+
+		private void ExecuteAlarm()
+		{
+			if (alarmList[0].SoundPath != string.Empty)
+			{
+				axPlayer.URL = alarmList[0].SoundPath;
+				axPlayer.Ctlcontrols.play();
+			}
+			MessageBox.Show("Get uppppp");
+			alarmList.RemoveAt(0);
+			notifyIconResize.Text = alarmList.Count > 0 ? $"Next alarm time: {alarmList[0].AlarmTime}" : Application.ProductName;
+		}
+
 		public MainForm()
 		{
 #if CONSOLE
@@ -116,6 +133,7 @@ namespace Clock
 			isVisible = true;
 			datetimeFormat = "HH:mm:ss";
 			startOnStartupToolStripMenuItem.Checked = isStartup(Application.ProductName);
+			alarmList = new List<Alarm>();
 			this.StartPosition = FormStartPosition.Manual;
 			this.Location = GetPosition();
 			this.BackColor = Properties.Settings.Default.BackgroundColor;
@@ -146,16 +164,7 @@ namespace Clock
 		{
 			DateTime timeNow = new DateTime(DateTime.Now.Ticks - DateTime.Now.Ticks % TimeSpan.TicksPerSecond);
 			labelTime.Text = DateTime.Now.ToString(datetimeFormat);
-			if (alarmTime.Equals(timeNow))
-			{
-				if (soundPath != string.Empty)
-				{
-					axPlayer.URL = soundPath;
-					axPlayer.Ctlcontrols.play();
-				}
-				MessageBox.Show("Get uppppp");
-				notifyIconResize.Text = "Clock";
-			}
+			if (alarmList.Count > 0 && alarmList[0].AlarmTime.Equals(timeNow)) ExecuteAlarm();
 		}
 
 		private void labelTime_DoubleClick(object sender, EventArgs e)
@@ -173,15 +182,8 @@ namespace Clock
 		private void cbPinBtn_CheckedChanged(object sender, EventArgs e)
 		{
 			this.TopMost = cbPinBtn.Checked;
-			cbPin.Checked = cbPinBtn.Checked;
 			cbPinBtn.BackgroundImage = cbPinBtn.Checked ? Properties.Resources.pin_fill.ToBitmap()
 				: Properties.Resources.pin_outline.ToBitmap();
-		}
-
-		private void cbPin_CheckedChanged(object sender, EventArgs e)
-		{
-			this.TopMost = cbPin.Checked;
-			cbPinBtn.Checked = cbPin.Checked;
 		}
 
 		private void notifyIconResize_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -269,9 +271,8 @@ namespace Clock
 			AlarmDialogue alarmForm = new AlarmDialogue();
 			if (alarmForm.ShowDialog() == DialogResult.OK)
 			{
-				alarmTime = alarmForm.AlarmTime;
-				soundPath = alarmForm.SoundPath;
-				notifyIconResize.Text = $"Alarm time: {alarmTime}";
+				AddAlarmToList(alarmForm.Alarm);
+				notifyIconResize.Text = $"Next alarm time: {alarmList[0].AlarmTime}";
 			}
 		}
 

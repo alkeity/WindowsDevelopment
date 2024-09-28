@@ -13,35 +13,39 @@ namespace Clock
 {
 	public partial class AlarmDialogue : Form
 	{
-		DateTime alarmTime;
-		string soundPath;
+		Alarm alarm;
 
-		public DateTime AlarmTime { get => alarmTime; }
-
-		public string SoundPath { get => soundPath; }
+		public Alarm Alarm { get => alarm; }
 
 		public AlarmDialogue()
 		{
 			InitializeComponent();
-			alarmTime = DateTime.Now;
-			soundPath = string.Empty;
+			alarm = new Alarm();
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)
 		{
-			this.DialogResult = DialogResult.OK;
-			alarmTime = dtAlarmPicker.Value;
+			try
+			{
+				alarm.AlarmTime = dtAlarmPicker.Value;
+				this.DialogResult = DialogResult.OK;
+			}
+			catch (ArgumentOutOfRangeException ex)
+			{
+				MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				this.DialogResult = DialogResult.None;
+			}
 		}
 
 		private void btnCancel_Click(object sender, EventArgs e)
 		{
-			this.DialogResult=DialogResult.Cancel;
+			this.DialogResult = DialogResult.Cancel;
 		}
 
 		private void btnChooseSound_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog ofd = new OpenFileDialog();
-			if (ofd.ShowDialog() == DialogResult.OK) soundPath = ofd.FileName;
+			if (ofd.ShowDialog() == DialogResult.OK) alarm.SoundPath = ofd.FileName;
 		}
 	}
 
@@ -68,6 +72,12 @@ namespace Clock
 				if (File.Exists(value)) soundPath = value;
 				else throw new FileNotFoundException($"File {value} not found.");
 			}
+		}
+
+		public Alarm()
+		{
+			alarmTime = DateTime.Now;
+			soundPath = string.Empty;
 		}
 
 		public int CompareTo(object obj)
