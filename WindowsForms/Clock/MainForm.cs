@@ -1,4 +1,4 @@
-﻿//#define CONSOLE
+﻿#define CONSOLE
 
 using System;
 using System.Collections.Generic;
@@ -107,11 +107,17 @@ namespace Clock
 			notifyIconResize.Text = alarmList.Count > 0 ? $"Next alarm time: {alarmList[0].AlarmTime}" : Application.ProductName;
 		}
 
-		public void AddAlarmToList(Alarm alarm)
+		// add new alarm to the list. returns true on success, false if specified alarm already exists
+		public bool AddAlarmToList(Alarm alarm)
 		{
-			alarmList.Add(alarm);
-			alarmList.Sort();
-			ChangeTrayName();
+			if (!alarmList.Contains(alarm))
+			{
+				alarmList.Add(alarm);
+				alarmList.Sort();
+				ChangeTrayName();
+				return true;
+			}
+			return false;
 		}
 
 		public void RemoveAlarmFromList(int alarmID)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Clock
 {
-	public class Alarm : IComparable
+	public class Alarm : object, IComparable, IEquatable<Alarm>
 	{
 		DateTime alarmTime;
 		string soundPath;
@@ -17,7 +17,11 @@ namespace Clock
 			get => alarmTime;
 			set
 			{
-				if (DateTime.Now < value) alarmTime = value;
+				if (DateTime.Now < value)
+				{
+					DateTime temp = value;
+					alarmTime = temp.Date + new TimeSpan(temp.TimeOfDay.Hours, temp.TimeOfDay.Minutes, 0);
+				}
 				else throw new ArgumentOutOfRangeException($"Can't set alarm in the past. Alarm time: {value}.");
 			}
 		}
@@ -34,13 +38,19 @@ namespace Clock
 
 		public Alarm()
 		{
-			alarmTime = DateTime.Now;
+			DateTime temp = DateTime.Now;
+			alarmTime = temp.Date + new TimeSpan(temp.TimeOfDay.Hours, temp.TimeOfDay.Minutes, 0);
 			soundPath = string.Empty;
 		}
 
 		public int CompareTo(object obj)
 		{
 			return alarmTime.CompareTo((obj as Alarm).AlarmTime);
+		}
+
+		public bool Equals(Alarm other)
+		{
+			return alarmTime.Equals(other.alarmTime);
 		}
 
 		public override string ToString()

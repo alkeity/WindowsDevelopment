@@ -37,8 +37,11 @@ namespace Clock
 			AlarmDialogue alarmDialogue = new AlarmDialogue();
 			if (alarmDialogue.ShowDialog() == DialogResult.OK)
 			{
-				owner.AddAlarmToList(alarmDialogue.Alarm);
-				lbAlarms.Items.Add((Alarm)alarmDialogue.Alarm);
+				Alarm temp = alarmDialogue.Alarm;
+				Console.WriteLine(lbAlarms.Items.Contains(temp));
+				Console.WriteLine("loop:");
+				foreach (var item in lbAlarms.Items) Console.WriteLine(item.Equals(temp));
+				if (owner.AddAlarmToList(alarmDialogue.Alarm)) lbAlarms.Items.Add((Alarm)alarmDialogue.Alarm);
 			}
 			lbAlarms.SetSelected(lbAlarms.Items.Count - 1, true);
 		}

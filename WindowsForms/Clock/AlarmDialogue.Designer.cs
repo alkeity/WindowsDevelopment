@@ -38,18 +38,19 @@
 			// dtAlarmPicker
 			// 
 			this.dtAlarmPicker.CalendarFont = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.dtAlarmPicker.CustomFormat = " HH:mm";
 			this.dtAlarmPicker.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.dtAlarmPicker.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-			this.dtAlarmPicker.Location = new System.Drawing.Point(72, 12);
+			this.dtAlarmPicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+			this.dtAlarmPicker.Location = new System.Drawing.Point(80, 12);
 			this.dtAlarmPicker.Name = "dtAlarmPicker";
 			this.dtAlarmPicker.ShowUpDown = true;
-			this.dtAlarmPicker.Size = new System.Drawing.Size(200, 44);
+			this.dtAlarmPicker.Size = new System.Drawing.Size(122, 44);
 			this.dtAlarmPicker.TabIndex = 0;
 			// 
 			// btnOK
 			// 
 			this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.btnOK.Location = new System.Drawing.Point(175, 78);
+			this.btnOK.Location = new System.Drawing.Point(104, 80);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
 			this.btnOK.TabIndex = 1;
@@ -60,7 +61,7 @@
 			// btnCancel
 			// 
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(256, 78);
+			this.btnCancel.Location = new System.Drawing.Point(185, 80);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 2;
@@ -83,7 +84,7 @@
 			this.AcceptButton = this.btnOK;
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.CancelButton = this.btnCancel;
-			this.ClientSize = new System.Drawing.Size(344, 113);
+			this.ClientSize = new System.Drawing.Size(272, 113);
 			this.Controls.Add(this.btnChooseSound);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnOK);
