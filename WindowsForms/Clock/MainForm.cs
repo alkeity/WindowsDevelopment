@@ -145,10 +145,14 @@ namespace Clock
 			AllocConsole();
 #endif
 			InitializeComponent();
-
 			fontCollection = new PrivateFontCollection();
-			fontCollection.AddFontFile("..\\..\\Resources\\digital-7.ttf");
-			// TODO like 93 fails with fnf if app added to registry
+			uint dummy = 0;
+			byte[] fontData = Properties.Resources.digital_7;
+			IntPtr fontPtr = Marshal.AllocCoTaskMem(fontData.Length);
+			Marshal.Copy(fontData, 0, fontPtr, fontData.Length);
+			fontCollection.AddMemoryFont(fontPtr, Properties.Resources.digital_7.Length);
+			AddFontMemResourceEx(fontPtr, (uint)Properties.Resources.digital_7.Length, IntPtr.Zero, ref dummy);
+			Marshal.FreeCoTaskMem(fontPtr);
 
 			isVisible = true;
 			datetimeFormat = "HH:mm:ss";
@@ -309,5 +313,8 @@ namespace Clock
 		private static extern bool AllocConsole();
 		[DllImport("kernel32.dll")]
 		private static extern bool FreeConsole();
+		[DllImport("gdi32.dll")]
+		private static extern IntPtr AddFontMemResourceEx(IntPtr pbFont, uint cbFont,
+			IntPtr pdv, [System.Runtime.InteropServices.In] ref uint pcFonts);
 	}
 }

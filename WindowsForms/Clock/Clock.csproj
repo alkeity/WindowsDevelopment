@@ -113,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="g12-clock_97294.ico" />
+    <EmbeddedResource Include="Resources\digital-7.ttf" />
     <None Include="Resources\time_clock_icon_145885.ico" />
     <None Include="Resources\pin_outline.ico" />
     <None Include="Resources\pin_fill.ico" />
